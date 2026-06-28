@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenCallFlow Assistant</title>
+    <style>
+        :root {
+            --brand-color: #0056b3;
+            --brand-hover: #004494;
+            --gray-text: #6A6A6A;
+            --dark-bg: #1a1a1a;
+            --light-bg: #F5F5F7;
+            --card-bg: #FFFFFF;
+            --text-color: #333333;
+            --border-color: #E0E0E0;
+            --success-color: #2E7D32;
+            --alert-color: #C62828;
+            --warning-color: #856404;
+            --warning-bg: #FFF3CD;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: var(--light-bg); color: var(--text-color); display: flex; height: 100vh; overflow: hidden; }
+        #app-container { display: flex; width: 100%; height: 100%; }
+
+        #sidebar { width: 320px; background-color: var(--dark-bg); color: white; padding: 20px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; border-right: 4px solid var(--brand-color); }
+        #sidebar h2 { font-size: 0.9rem; color: #74aef5; margin-top: 10px; text-transform: uppercase; letter-spacing: 1px; }
+
+        #ref-search { width: 100%; padding: 8px 12px; border-radius: 4px; border: 1px solid #444; background: #222; color: white; margin-bottom: 5px; }
+        #ref-search::placeholder { color: #888; }
+
+        .objection-btn { background: #222; color: #DDD; border: 1px solid #444; padding: 10px 12px; border-radius: 6px; cursor: pointer; text-align: left; font-size: 0.9rem; transition: all 0.2s ease; }
+        .objection-btn:hover { background: var(--brand-color); color: white; border-color: var(--brand-color); }
+
+        #sidebar-footer { margin-top: auto; padding-top: 20px; border-top: 1px solid #333; display: flex; flex-direction: column; gap: 10px; }
+        .hotfix-btn { background: transparent; color: #aaa; border: 1px solid #444; padding: 8px 10px; font-size: 0.75rem; cursor: pointer; border-radius: 4px; width: 100%; }
+        .hotfix-btn:hover { background: #333; }
+
+        .floating-reset { position: fixed; bottom: 30px; right: 30px; background: var(--brand-color); color: white; border: none; padding: 15px 25px; border-radius: 30px; box-shadow: 0 4px 15px rgba(0, 86, 179, 0.4); cursor: pointer; font-weight: bold; z-index: 999; }
+        .floating-reset:hover { background: var(--brand-hover); }
+
+        #main-content { flex: 1; display: flex; flex-direction: column; height: 100%; background-color: var(--light-bg); }
+        header { background-color: white; padding: 15px 30px; border-bottom: 1px solid var(--border-color); }
+        .logo-text { font-size: 1.2rem; font-weight: 800; color: var(--brand-color); }
+
+        .flow-container { flex: 1; padding: 20px 40px 100px 40px; overflow-y: auto; display: flex; flex-direction: column; gap: 25px; align-items: center; }
+        .phase-card { background-color: var(--card-bg); border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); width: 100%; max-width: 800px; padding: 30px; border-left: 4px solid #E0E0E0; transition: border-color 0.3s ease; }
+        .phase-card.active-focus { border-left-color: var(--brand-color); box-shadow: 0 4px 25px rgba(0, 86, 179, 0.15); }
+
+        h1 { font-size: 1.4rem; margin-bottom: 15px; color: #111; display: flex; justify-content: space-between; align-items: center; }
+        .step-badge { font-size: 0.8rem; background: #E0E0E0; padding: 4px 10px; border-radius: 12px; color: var(--gray-text); }
+        .script-box { background-color: #f4f8fc; border-left: 4px solid var(--brand-color); padding: 15px 20px; border-radius: 0 8px 8px 0; margin-bottom: 20px; font-size: 1.05rem; line-height: 1.6; }
+/*         .notes-box { font-size: 0.85rem; color: var(--gray-text); font-style: italic; margin-top: 15px; padding: 10px; background: #f9f9f9; border-radius: 4px; } */
+
+        .alert-banner { padding: 12px 15px; border-radius: 6px; margin-bottom: 20px; font-size: 0.95rem; }
+        .alert-banner.warning { background-color: var(--warning-bg); border: 1px solid #FFEBAA; color: var(--warning-color); }
+        .alert-banner.stop { background-color: #F8D7DA; border-color: #F5C6CB; color: #721C24; }
+
+        .btn-container { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 6px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .btn-primary { background-color: var(--brand-color); color: white; }
+        .btn-secondary { background-color: #E0E0E0; color: var(--text-color); }
+        .btn-success { background-color: var(--success-color); color: white; }
+        .btn-danger { background-color: var(--alert-color); color: white; }
+        .btn-muted { opacity: 0.4; filter: grayscale(50%); }
+        .btn-selected { box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.2); transform: scale(0.98); }
+
+        #modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
+        .modal-content { background: white; padding: 25px; border-radius: 8px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; color: var(--text-color); }
+        .modal-wide { max-width: 900px; }
+        textarea { width: 100%; height: 100px; margin-top: 10px; font-family: monospace; padding: 10px; border: 1px solid #ccc; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.8rem; }
+        th, td { border: 1px solid var(--border-color); padding: 8px; text-align: left; }
+    </style>
+    <script>
+    (function() {
+        // The keycodes for: Up, Up, Down, Down, Left, Right, Left, Right, B, A
+        const konamiCode = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65];
+        let currentIndex = 0;
+
+        document.addEventListener('keydown', (event) => {
+            // Check if the pressed key matches the current key in the sequence
+            if (event.keyCode === konamiCode[currentIndex]) {
+                currentIndex++;
+
+                // If the whole sequence was entered correctly
+                if (currentIndex === konamiCode.length) {
+                    alert('Konami Code Activated! Only Kinds Customers');
+
+                    // Spin the entire webpage around
+                    document.body.style.transition = 'transform 1s';
+                    document.body.style.transform = 'rotate(368deg)';
+
+                    // Reset the rotation after 1 second
+                    setTimeout(() => {
+                        document.body.style.transform = 'rotate(0deg)';
+                    }, 1000);
+
+                    // Reset the sequence tracker
+                    currentIndex = 0;
+                }
+            } else {
+                // Reset the sequence tracker if the wrong key is pressed
+                currentIndex = 0;
+            }
+        });
+    })();
+    </script>
+</head>
+<body>
+
+    <button class="floating-reset" onclick="resetCall()">🔄 New Call</button>
+
+    <div id="app-container">
+        <aside id="sidebar">
+            <h2>Panic Buttons</h2>
+            <div id="sidebar-panic-container" style="display: flex; flex-direction: column; gap: 10px;"></div>
+
+            <h2>Live Reference</h2>
+            <input type="text" id="ref-search" onkeyup="filterRefs()" placeholder="Search references...">
+            <div id="sidebar-ref-container" style="display: flex; flex-direction: column; gap: 10px;"></div>
+
+            <div id="sidebar-footer">
+                <button class="hotfix-btn" onclick="showHistory()">📜 View Call History</button>
+                <button class="hotfix-btn" onclick="openHotfixModal()">⚙️ Hotfix Config</button>
+                <hr style="border-color: #333;">
+                <div style="font-size: 0.7rem; color: #888;">
+                    OpenCallFlow Version: <strong>0.1.0 (alpha)</strong><br>
+                    Flow Version: <strong id="version-display"></strong><br>
+                    Updated: <strong id="updated-display"></strong><br><br>
+                    GitHub:     FortePC
+                </div>
+            </div>
+        </aside>
+
+        <main id="main-content">
+            <header>
+                <div class="logo-text">OpenCallFlow Assistant</div>
+            </header>
+            <div class="flow-container" id="flow-scroll-wrapper"></div>
+        </main>
+    </div>
+
+    <div id="modal-overlay" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h2 id="modal-title" style="color: var(--brand-color); margin-bottom: 15px;"></h2>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+        let appConfig = {
+  "version": "1.0.0",
+  "lastUpdated": "2026-06-27",
+  "panicButtons": [
+    {
+      "id": "supervisor",
+      "label": "🛑 Caller requests supervisor",
+      "content": "\"I completely understand your frustration. I am happy to get a supervisor for you. May I place you on a brief hold while I brief them on the situation?\""
+    },
+    {
+      "id": "cancel",
+      "label": "⚠️ Threatens to cancel",
+      "content": "\"I'd hate to see you go! Let's take a look at your account together to see if there is a better plan or solution that fits your needs today.\""
+    }
+  ],
+  "referenceLinks": [
+    {
+      "id": "pricing",
+      "label": "📑 Standard Pricing Tier",
+      "content": "<div style=\"overflow-x: auto;\"><table><thead><tr><th>Tier</th><th>Price</th><th>Features</th></tr></thead><tbody><tr><td>Basic</td><td>$29.99/mo</td><td>1 User, 5GB Storage</td></tr><tr><td>Pro</td><td>$59.99/mo</td><td>5 Users, 50GB Storage</td></tr><tr><td>Enterprise</td><td>$119.99/mo</td><td>Unlimited Users, 500GB Storage</td></tr></tbody></table></div>"
+    },
+    {
+      "id": "refund_policy",
+      "label": "📄 Refund Policy",
+      "content": "Refunds can only be processed within 14 days of the initial transaction. After 14 days, offer account credits only."
+    }
+  ],
+  "steps": [
+    {
+      "id": "step_1",
+      "title": "Greeting & Verification",
+      "badge": "START",
+      "script": "\"Thank you for calling our sales line! My name is <strong>[Agent Name]</strong>. Who do I have the pleasure of speaking with today?\"<br><br>\"Thank you <strong>[Customer Name]</strong>, what has you calling in today?\"",
+      "note": "Listen actively, pull out pain points (price hikes, slow speeds, dropped connections, workflow issues).",
+      "buttons": [
+        {
+          "label": "Existing Customer Sale",
+          "target": "existingCustomer",
+          "style": "btn-primary"
+        },
+        {
+          "label": "New Customer Sale",
+          "target": "newCustomer",
+          "style": "btn-primary"
+        },
+        {
+          "label": "Junk Call",
+          "target": "endCall",
+          "style": "btn-secondary"
+        }
+      ]
+    },
+    {
+      "id": "existingCustomer",
+      "title": "Locate Their Account",
+      "badge": "LOOKUP",
+      "alert_type": "warning",
+      "script": "\"I can certainly help you with that! To make sure I am looking at the correct file, may I please have your account number, or the phone number associated with your account?\"<br><br><em>[While searching/loading]</em> \"Thank you. While my system is pulling that up, how has your week been going so far?\"",
+      "buttons": [
+        {
+          "label": "Authenticated",
+          "target": "authenticated",
+          "style": "btn-success"
+        },
+        {
+          "label": "Unable to Authenticate",
+          "target": "unabletoauthenticated",
+          "style": "btn-warning"
+        },
+        {
+          "label": "Unable to Locate Account",
+          "target": "unabletolocateaccount",
+          "style": "btn-danger"
+        }
+      ]
+    },
+    {
+      "id": "authenticated",
+      "title": "Authenticated",
+      "badge": "SUCCESS",
+      "script": "\"Perfect, thank you! I have successfully accessed your account profile. It looks like you have been with us for a while, and I want to personally thank you for your loyalty! Now that we have this open, let's look at how we can get you set up with the upgrades you are looking for today.\"",
+      "note": "Do not rush to or through this step, spend a couple minutes building rapport with your customer.",
+      "buttons": [
+        {
+          "label": "Proceed with Sale",
+          "target": "discoverNeeds",
+          "style": "btn-primary"
+        }
+      ]
+    },
+    {
+      "id": "unabletoauthenticated",
+      "title": "Unable to Authenticate",
+      "badge": "SECURITY",
+      "script": "\"I sincerely apologize, but for your security and data protection, I am unable to verify your profile credentials over this line. I want to make sure your information stays safe. I can definitely try searching one more time if you have an alternate PIN or password? Otherwise, to protect your privacy, I would recommend reaching out to our customer service helpline or visiting one of our physical retail stores with a valid photo ID to quickly update your access.\"",
+      "note": "Have you tried walking them through resetting their security PIN through their account management app?",
+      "buttons": [
+        {
+          "label": "Try Again",
+          "target": "existingCustomer",
+          "style": "btn-secondary"
+        },
+        {
+          "label": "Create New Account",
+          "target": "newCustomer",
+          "style": "btn-secondary"
+        },
+        {
+          "label": "End Call",
+          "target": "endCall",
+          "style": "btn-danger"
+        }
+      ]
+    },
+    {
+      "id": "unabletolocateaccount",
+      "title": "Unable to Locate Account",
+      "badge": "NOT FOUND",
+      "script": "\"It looks like I am having trouble pulling up an active account using that specific information. No worries at all though! We can easily get a fresh profile built for you right now so you can take advantage of our newest promotions. Let's go ahead and start from scratch to see how we can get you set up!\"",
+      "buttons": [
+        {
+          "label": "Create New Profile",
+          "target": "newCustomer",
+          "style": "btn-success"
+        },
+        {
+          "label": "Go Back & Re-try Search",
+          "target": "existingCustomer",
+          "style": "btn-secondary"
+        }
+      ]
+    },
+    {
+      "id": "newCustomer",
+      "title": "Create Customer Profile",
+      "badge": "NEW ACCT",
+      "script": "\"Welcome aboard! I am thrilled to help you get set up as a new customer today. To build your brand-new profile and ensure we can check for the best promotional rates available in your area, may I get your full legal name, spelling of the last name, and your preferred email address?\"",
+      "buttons": [
+        {
+          "label": "Profile Created",
+          "target": "discoverNeeds",
+          "style": "btn-success"
+        },
+        {
+          "label": "Abandons Call",
+          "target": "endCall",
+          "style": "btn-secondary"
+        }
+      ]
+    },
+    {
+      "id": "discoverNeeds",
+      "title": "Discover Needs",
+      "badge": "DISCOVERY",
+      "alert_type": "warning",
+      "script": "\"To ensure I match you with the absolute best promotions and the perfect tier for your daily use, let me ask you a few quick questions: What are you primarily looking to do with our services? Are you using this more for casual browsing, working from home, streaming, or running a business? Also, what are you currently using, and what changes are you hoping to see today?\"",
+      "note": "Ask open-ended questions. Focus on identifying specific pain points (frustrations with current speeds, data caps, hidden fees) to anchor your eventual solution pitch.",
+      "buttons": [
+        {
+          "label": "Pitch Solution",
+          "target": "pitchSolution",
+          "style": "btn-success"
+        }
+      ]
+    },
+    {
+      "id": "pitchSolution",
+      "title": "Pitch the Perfect Solution",
+      "badge": "THE PITCH",
+      "script": "\"Based on what you shared about needing a reliable connection for <strong>[Pain Point / Use Case]</strong>, I highly recommend our <strong>[Tier Name]</strong> package. This completely eliminates <strong>[Pain Point]</strong> by offering you <strong>[Top Feature/Benefit]</strong>. Right now, we have a fantastic promotion running where you get all of this for just <strong>[Price]</strong> a month! How does that sound to you?\"",
+      "buttons": [
+        {
+          "label": "Customer Accepts",
+          "target": "paymentProcessing",
+          "style": "btn-success"
+        },
+        {
+          "label": "Customer Has Objections",
+          "target": "handleObjections",
+          "style": "btn-warning"
+        }
+      ]
+    },
+    {
+      "id": "handleObjections",
+      "title": "Overcome Objections",
+      "badge": "REBOUND",
+      "script": "\"I completely hear where you are coming from regarding <strong>[Price / Value / Commitment]</strong>. It makes total sense to want to ensure you are getting real value. Many clients who felt the same way initially found that this plan actually saves them money in the long run by preventing <strong>[Pain Point]</strong>. Remember, we also back this up with our 14-day policy. Let's try this out risk-free to make sure it delivers for you; shall we proceed?\"",
+      "buttons": [
+        {
+          "label": "Objection Overcome",
+          "target": "paymentProcessing",
+          "style": "btn-success"
+        },
+        {
+          "label": "Refuses / Hangs Up",
+          "target": "endCall",
+          "style": "btn-danger"
+        }
+      ]
+    },
+    {
+      "id": "paymentProcessing",
+      "title": "Payment & Processing",
+      "badge": "CHECKOUT",
+      "script": "\"Fantastic choice! You are going to love this setup. To finalize your secure order and lock in today's promotional rate, I just need to process the initial month payment of <strong>[Amount]</strong>. For your billing preferences, will you be using Visa, Mastercard, or an Electronic Check today?\"",
+      "note": "Follow all secure payment and PCI compliance protocols. Never write down or read back CVV codes aloud.",
+      "buttons": [
+        {
+          "label": "Payment Successful",
+          "target": "orderConfirmation",
+          "style": "btn-success"
+        },
+        {
+          "label": "Payment Declined",
+          "target": "paymentDeclined",
+          "style": "btn-warning"
+        }
+      ]
+    },
+    {
+      "id": "paymentDeclined",
+      "title": "Payment Declined",
+      "badge": "PAYMENT FAIL",
+      "alert_type": "stop",
+      "script": "\"I apologize, it looks like that transaction didn't go through on my end. It happens from time to time—sometimes it's just a simple typo or a bank security flag. Would you like to double-check the card details with me, or perhaps try a different form of payment to get your services activated today?\"",
+      "note": "Stay calm and professional. Do not blame the customer. If they are frustrated, remind them that their bank may be blocking the transaction for security and suggest they contact their bank while you hold.",
+      "buttons": [
+        {
+          "label": "Try a Different Card",
+          "target": "paymentProcessing",
+          "style": "btn-primary"
+        },
+        {
+          "label": "Unable to Pay (End Call)",
+          "target": "endCall",
+          "style": "btn-primary"
+        }
+      ]
+    },
+    {
+      "id": "orderConfirmation",
+      "title": "Order Confirmation",
+      "badge": "CONFIRM",
+      "script": "\"Excellent! The payment processed perfectly. Your official order confirmation number is <strong>[Confirmation #]</strong>, and I have sent a complete receipt along with onboarding instructions directly to your email. Your new services will be fully active and ready to go starting <strong>[Date/Time]</strong>!\"",
+      "buttons": [
+        {
+          "label": "Wrap Up Call",
+          "target": "endCall",
+          "style": "btn-primary"
+        }
+      ]
+    },
+    {
+      "id": "endCall",
+      "title": "Wrap Up & Disconnect",
+      "badge": "GOODBYE",
+      "script": "\"Before I let you go, are there any additional questions or other needs I can assist you with today? ... Wonderful! Thank you so much for choosing us. We are proud to have you with us. Have an absolutely fantastic rest of your day!\"",
+      "buttons": []
+    }
+  ]
+};
+
+        let flowMap = {};
+        let currentPath = [];
+        let historyPage = 0;
+
+        function initSidebar() {
+            document.getElementById('version-display').innerText = appConfig.version || '1.0.0';
+            document.getElementById('updated-display').innerText = appConfig.lastUpdated || 'N/A';
+
+            const panicContainer = document.getElementById('sidebar-panic-container');
+            const refContainer = document.getElementById('sidebar-ref-container');
+            panicContainer.innerHTML = ''; refContainer.innerHTML = '';
+
+            if(appConfig.panicButtons) {
+                appConfig.panicButtons.forEach(btn => {
+                    const b = document.createElement('button');
+                    b.className = 'objection-btn';
+                    b.innerText = btn.label;
+                    b.onclick = () => renderModal(btn.label, `<div class="script-box">${btn.content}</div>`);
+                    panicContainer.appendChild(b);
+                });
+            }
+
+            if(appConfig.referenceLinks) {
+                appConfig.referenceLinks.forEach(link => {
+                    const b = document.createElement('button');
+                    b.className = 'objection-btn ref-link-item';
+                    b.innerText = link.label;
+                    b.onclick = () => renderModal(link.label, link.content, true);
+                    refContainer.appendChild(b);
+                });
+            }
+        }
+
+        function filterRefs() {
+            const input = document.getElementById('ref-search').value.toLowerCase();
+            const items = document.querySelectorAll('.ref-link-item');
+            items.forEach(item => {
+                const text = item.innerText.toLowerCase();
+                item.style.display = text.includes(input) ? '' : 'none';
+            });
+        }
+
+        function renderModal(title, content, isWide = false) {
+            const modalBody = document.getElementById('modal-body');
+            const modalTitle = document.getElementById('modal-title');
+            const modalContent = document.querySelector('.modal-content');
+            const overlay = document.getElementById('modal-overlay');
+
+            modalTitle.innerText = title;
+            modalBody.innerHTML = content + `<br><br><button class="btn btn-secondary" onclick="closeModal()">Close</button>`;
+
+            if(isWide) modalContent.classList.add('modal-wide');
+            else modalContent.classList.remove('modal-wide');
+            overlay.style.display = 'flex';
+        }
+
+        function closeModal() { document.getElementById('modal-overlay').style.display = 'none'; }
+
+        function initFlow() {
+            flowMap = Object.fromEntries(appConfig.steps.map(s => [s.id, s]));
+            currentPath = [{ id: 'step_1', title: flowMap['step_1'].title, label: 'Started' }];
+            document.getElementById('flow-scroll-wrapper').innerHTML = '';
+            renderNode('step_1');
+        }
+
+        function saveToHistory(entry) {
+            let history = JSON.parse(localStorage.getItem('callHistory') || '[]');
+            history.unshift(entry);
+            try {
+                localStorage.setItem('callHistory', JSON.stringify(history));
+            } catch (e) {
+                if (e.name === 'QuotaExceededError') {
+                    history.splice(history.length - 10, 10);
+                    localStorage.setItem('callHistory', JSON.stringify(history));
+                }
+            }
+        }
+
+        function resetCall() {
+            if (currentPath.length > 0) saveToHistory({ timestamp: new Date().toLocaleString(), path: currentPath });
+            initFlow();
+        }
+
+        function renderNode(nodeId) {
+            const node = flowMap[nodeId];
+            if (!node) return;
+
+            const card = document.createElement('div');
+            card.className = 'phase-card active-focus';
+            card.id = `card-${node.id}`;
+
+            let buttonsHtml = '';
+            node.buttons.forEach((b, index) => {
+                const btnId = `btn-${node.id}-${index}`;
+                buttonsHtml += `<button id="${btnId}" class="btn ${b.style}" onclick="handleChoice(this, '${node.id}', '${b.target}', '${b.label}')">${b.label}</button>`;
+            });
+
+            card.innerHTML = `<h1>${node.title} <span class="step-badge">${node.badge}</span></h1>
+                ${node.alert_text ? `<div class="alert-banner ${node.alert_type}">${node.alert_text}</div>` : ''}
+                <div class="script-box">${node.script}</div>
+                ${node.note ? `<div class="notes-box"><em> ${node.note}</em></div>` : ''}
+                <div class="btn-container">${buttonsHtml}</div>`;
+            document.getElementById('flow-scroll-wrapper').appendChild(card);
+            card.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function handleChoice(btnEl, currentId, targetId, label) {
+            if (targetId === 'reset') { resetCall(); return; }
+
+            const pathIndex = currentPath.findIndex(p => p.id === currentId);
+            if (pathIndex !== -1 && pathIndex < currentPath.length - 1) {
+                currentPath = currentPath.slice(0, pathIndex + 1);
+            }
+
+            currentPath[currentPath.length - 1].label = label;
+            currentPath.push({ id: targetId, title: flowMap[targetId].title, label: '...' });
+
+            const card = document.getElementById(`card-${currentId}`);
+
+            card.querySelectorAll('.btn').forEach(b => {
+                b.classList.remove('btn-selected');
+                b.classList.add('btn-muted');
+            });
+            btnEl.classList.remove('btn-muted');
+            btnEl.classList.add('btn-selected');
+            card.classList.remove('active-focus');
+
+            let sibling = card.nextElementSibling;
+            while(sibling) {
+                const next = sibling.nextElementSibling;
+                sibling.remove();
+                sibling = next;
+            }
+
+            renderNode(targetId);
+        }
+
+        function showHistory(page = 0) {
+            historyPage = page;
+            const history = JSON.parse(localStorage.getItem('callHistory') || '[]');
+            const perPage = 10;
+            const start = historyPage * perPage;
+            const end = start + perPage;
+            const slice = history.slice(start, end);
+            const totalPages = Math.ceil(history.length / perPage);
+
+            let html = history.length === 0 ? '<p>No history found.</p>' :
+                `<table><thead><tr><th>Time Ended</th><th>Path Taken</th><th>Action</th></tr></thead><tbody>` +
+                slice.map((h, i) => `<tr>
+                    <td>${h.timestamp}</td>
+                    <td>${h.path.map(step => `<strong>${step.title}</strong>: ${step.label}`).join(' <br>➔ ')}</td>
+                    <td><button class="btn btn-danger" style="padding: 5px 10px;" onclick="deleteHistoryItem(${start + i})">Delete</button></td>
+                </tr>`).join('') + `</tbody></table>`;
+
+            html += `
+            <div style="margin-top:20px; display:flex; justify-content: space-between; align-items:center;">
+                <div>
+                    <button class="btn btn-secondary" onclick="showHistory(${historyPage - 1})" ${historyPage === 0 ? 'disabled' : ''}>Prev</button>
+                    <span style="margin: 0 10px;">Page ${historyPage + 1} of ${totalPages || 1}</span>
+                    <button class="btn btn-secondary" onclick="showHistory(${historyPage + 1})" ${end >= history.length ? 'disabled' : ''}>Next</button>
+                </div>
+                <div style="display:flex; gap: 10px;">
+                    <button class="btn btn-danger" onclick="clearHistory()">Clear All Logs</button>
+                    <button class="btn btn-primary" onclick="exportHistory()">Export JSON</button>
+                    <label class="btn btn-secondary" style="cursor: pointer; margin:0;">
+                        Import JSON <input type="file" style="display:none;" onchange="importHistory(event)">
+                    </label>
+                </div>
+            </div>`;
+
+            renderModal("Call History", html, true);
+        }
+
+        function exportHistory() {
+            const data = localStorage.getItem('callHistory') || '[]';
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `OpenCallFlow_History_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importHistory(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (!Array.isArray(imported)) throw new Error("File is not a valid history array.");
+
+                    let existing = JSON.parse(localStorage.getItem('callHistory') || '[]');
+
+                    // Merge logic: Add only if the timestamp and path string aren't identical
+                    imported.forEach(item => {
+                        const isDuplicate = existing.some(ex =>
+                            ex.timestamp === item.timestamp &&
+                            JSON.stringify(ex.path) === JSON.stringify(item.path)
+                        );
+                        if (!isDuplicate) existing.unshift(item);
+                    });
+
+                    localStorage.setItem('callHistory', JSON.stringify(existing));
+                    alert("History merged successfully!");
+                    showHistory(0);
+                } catch(err) {
+                    alert("Invalid History JSON!");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function deleteHistoryItem(index) {
+            if (confirm("Are you sure you want to delete this specific call record?")) {
+                let history = JSON.parse(localStorage.getItem('callHistory') || '[]');
+                history.splice(index, 1);
+                localStorage.setItem('callHistory', JSON.stringify(history));
+                showHistory(historyPage);
+            }
+        }
+
+        function clearHistory() {
+            if (confirm("TRIPLE CONFIRMATION: Are you ABSOLUTELY sure you want to clear ALL call history? This cannot be undone.")) {
+                if (confirm("Are you really, really sure?")) {
+                    if (confirm("Final confirmation: Delete all logs?")) {
+                        localStorage.removeItem('callHistory');
+                        showHistory(0);
+                    }
+                }
+            }
+        }
+
+        function openHotfixModal() {
+            renderModal("System Hotfix", `<textarea id="hotfix-input">${JSON.stringify(appConfig, null, 2)}</textarea><div style="margin-top:15px; display:flex; gap:10px;"><button class="btn btn-primary" onclick="applyHotfix()">Apply</button><button class="btn btn-secondary" onclick="closeModal()">Cancel</button></div>`);
+        }
+
+        function applyHotfix() {
+            try { appConfig = JSON.parse(document.getElementById('hotfix-input').value); initSidebar(); initFlow(); closeModal(); } catch(e) { alert("Invalid JSON!"); }
+        }
+
+        window.onload = () => { initSidebar(); initFlow(); };
+    </script>
+</body>
+</html>
