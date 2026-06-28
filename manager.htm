@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>OpenCallFlow Configurator</title>
+    <style>
+        :root { --brand-color: #0056b3; --dark-bg: #1a1a1a; --light-bg: #F5F5F7; --text-color: #333333; }
+        body { font-family: sans-serif; background: var(--light-bg); margin: 0; display: flex; height: 100vh; }
+        
+        #sidebar { width: 250px; background: var(--dark-bg); color: white; padding: 20px; flex-shrink: 0; }
+        .nav-btn { display: block; width: 100%; padding: 12px; margin-bottom: 10px; background: #333; color: #ddd; border: none; cursor: pointer; text-align: left; border-radius: 4px; }
+        .nav-btn.active { background: var(--brand-color); color: white; }
+        
+        #main { flex: 1; padding: 30px; overflow-y: auto; scroll-behavior: smooth; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        
+        label { display: block; font-weight: bold; margin: 15px 0 5px; font-size: 0.85rem; color: #555; }
+        input, textarea, select { width: 100%; padding: 10px; margin-bottom: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        textarea { resize: vertical; min-height: 60px; }
+        .row { display: flex; gap: 8px; align-items: center; border-bottom: 1px solid #eee; padding: 10px 0; }
+        
+        button.action { padding: 8px 15px; border-radius: 4px; cursor: pointer; border: none; font-weight: bold; margin-top: 10px;}
+        .btn-add { background: var(--brand-color); color: white; }
+        .btn-del { background: #ff4d4d; color: white; }
+        
+        .icon-btn { padding: 6px 10px; cursor: pointer; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-weight: bold; display: flex; align-items: center; justify-content: center; }
+        .icon-btn:hover { background: #eee; }
+        .icon-btn.danger { color: #ff4d4d; border-color: #ffb3b3; }
+        .icon-btn.danger:hover { background: #ffeeee; }
+        
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #ddd; padding-bottom: 10px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        
+        pre { background: #eee; padding: 15px; border-radius: 5px; white-space: pre-wrap; word-break: break-all; }
+
+        .dropdown { position: relative; display: inline-block; }
+        .dropdown-content { display: none; position: absolute; right: 0; background-color: white; min-width: 140px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); z-index: 1; border-radius: 4px; overflow: hidden; border: 1px solid #ccc;}
+        .dropdown-content button { color: black; padding: 10px 16px; text-decoration: none; display: block; width: 100%; text-align: left; border: none; background: none; cursor: pointer; border-bottom: 1px solid #eee;}
+        .dropdown-content button:hover { background-color: #f1f1f1; }
+        .show { display: block; }
+    </style>
+</head>
+<body>
+
+<div id="sidebar">
+    <h3>OpenCallFlow Config</h3>
+    <button class="nav-btn active" onclick="showSection('meta')">Global Settings</button>
+    <button class="nav-btn" onclick="showSection('panic')">Panic Buttons</button>
+    <button class="nav-btn" onclick="showSection('ref')">Reference Links</button>
+    <button class="nav-btn" onclick="showSection('steps')">Flow Steps</button>
+    <button class="nav-btn" onclick="showSection('export')">JSON Export/Import</button>
+</div>
+
+<div id="main">
+    <div id="section-meta" class="tab-content">
+        <div class="section-header">
+            <h2>Global Settings</h2>
+        </div>
+        <div class="card">
+            <label>Flow Version</label>
+            <input id="meta-version" value="1.0.0" onchange="updateMeta('version', this.value)">
+            <label>Last Updated</label>
+            <input id="meta-updated" type="date" onchange="updateMeta('lastUpdated', this.value)">
+        </div>
+    </div>
+
+    <div id="section-panic" class="tab-content" style="display:none;">
+        <div class="section-header">
+            <h2>Panic Buttons</h2>
+            <button class="action btn-add" onclick="addItem('panicButtons')">+ Add Button</button>
+        </div>
+        <div id="list-panic"></div>
+    </div>
+
+    <div id="section-ref" class="tab-content" style="display:none;">
+        <div class="section-header">
+            <h2>Reference Links</h2>
+            <button class="action btn-add" onclick="addItem('referenceLinks')">+ Add Link</button>
+        </div>
+        <div id="list-ref"></div>
+    </div>
+
+    <div id="section-steps" class="tab-content" style="display:none;">
+        <div class="section-header">
+            <h2>Flow Steps</h2>
+            <button class="action btn-add" onclick="addStepAt(state.steps.length)">+ Add Step to End</button>
+        </div>
+        <div id="list-steps"></div>
+    </div>
+
+    <div id="section-export" class="tab-content" style="display:none;">
+        <h2>JSON Configuration</h2>
+        <button class="action btn-add" onclick="copyJSON()">Copy to Clipboard</button>
+        <textarea id="import-area" placeholder="Paste JSON here to import..." style="height: 150px; margin-top:20px;"></textarea>
+        <button class="action" onclick="importJSON()">Load JSON</button>
+        <pre id="json-output"></pre>
+    </div>
+</div>
+
+<script>
+    let state = {
+        version: "1.0.0",
+        lastUpdated: new Date().toISOString().split('T')[0],
+        panicButtons: [],
+        referenceLinks: [],
+        steps: [{ id: "step_1", title: "Greeting", badge: "Greeting", alert_type: "", alert_text: "", script: "", note: "", buttons: [] }]
+    };
+
+    document.getElementById('meta-updated').value = state.lastUpdated;
+
+    let stepToScroll = null;
+
+    window.onclick = function(event) {
+        if (!event.target.matches('.dropbtn')) {
+            var dropdowns = document.getElementsByClassName("dropdown-content");
+            for (var i = 0; i < dropdowns.length; i++) {
+                if (dropdowns[i].classList.contains('show')) {
+                    dropdowns[i].classList.remove('show');
+                }
+            }
+        }
+    }
+
+    function toggleDropdown(id) { document.getElementById("dropdown-" + id).classList.toggle("show"); }
+
+    function showSection(id) {
+        document.querySelectorAll('.tab-content').forEach(s => s.style.display = 'none');
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('section-' + id).style.display = 'block';
+        event.target.classList.add('active');
+        render();
+    }
+
+    function updateMeta(field, val) { state[field] = val; render(); }
+
+    function render() {
+        document.getElementById('meta-version').value = state.version || '';
+        document.getElementById('meta-updated').value = state.lastUpdated || '';
+
+        renderList('list-panic', 'panicButtons', ['id', 'label', 'content']);
+        renderList('list-ref', 'referenceLinks', ['id', 'label', 'content']);
+        
+        const container = document.getElementById('list-steps');
+        container.innerHTML = '';
+        state.steps.forEach((step, idx) => {
+            const div = document.createElement('div');
+            div.className = 'card';
+            div.id = `step-card-${idx}`;
+            
+            let controlsHTML = `<div style="display: flex; gap: 5px;">`;
+            if (idx > 0) {
+                if (idx > 1) controlsHTML += `<button class="icon-btn" title="Move Up" onclick="moveStepUp(${idx})">↑</button>`;
+                if (idx < state.steps.length - 1) controlsHTML += `<button class="icon-btn" title="Move Down" onclick="moveStepDown(${idx})">↓</button>`;
+                controlsHTML += `
+                    <div class="dropdown">
+                        <button class="icon-btn dropbtn" title="Add Step" onclick="toggleDropdown(${idx})">+</button>
+                        <div id="dropdown-${idx}" class="dropdown-content">
+                            <button onclick="addStepAt(${idx})">Add Step Before</button>
+                            <button onclick="addStepAt(${idx + 1})">Add Step After</button>
+                        </div>
+                    </div>
+                    <button class="icon-btn danger" title="Delete Step" onclick="deleteStep(${idx})">✖</button>
+                `;
+            } else {
+                controlsHTML += `<button class="icon-btn" title="Add Step After" onclick="addStepAt(1)">+ Add After</button>`;
+            }
+            controlsHTML += `</div>`;
+
+            div.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; margin-bottom: 10px;">
+                    <h4 style="margin: 0; color: var(--brand-color);">Step ${idx + 1}</h4>
+                    ${controlsHTML}
+                </div>
+                
+                <div class="grid-2">
+                    <div>
+                        <label>ID (Enforced: ${idx === 0 ? 'step_1' : ''})</label>
+                        <input value="${step.id || ''}" ${idx === 0 ? 'readonly' : ''} onchange="updateStep(${idx}, 'id', this.value)">
+                    </div>
+                    <div>
+                        <label>Badge</label>
+                        <input value="${step.badge || ''}" onchange="updateStep(${idx}, 'badge', this.value)" placeholder="e.g., Ask, Close">
+                    </div>
+                </div>
+
+                <label>Title</label>
+                <input value="${step.title || ''}" onchange="updateStep(${idx}, 'title', this.value)">
+                
+                <div class="grid-2" style="background: #fff3cd; padding: 10px; border-radius: 4px; margin-top: 15px; border: 1px solid #ffeeba;">
+                    <div>
+                        <label style="margin-top:0;">Alert Type</label>
+                        <select onchange="updateStep(${idx}, 'alert_type', this.value)">
+                            <option value="" ${!step.alert_type ? 'selected' : ''}>None</option>
+                            <option value="warning" ${step.alert_type === 'warning' ? 'selected' : ''}>Warning (Yellow)</option>
+                            <option value="stop" ${step.alert_type === 'stop' ? 'selected' : ''}>Stop (Red)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="margin-top:0;">Alert Text</label>
+                        <input value="${step.alert_text ? step.alert_text.replace(/"/g, '&quot;') : ''}" onchange="updateStep(${idx}, 'alert_text', this.value)">
+                    </div>
+                </div>
+
+                <label>Agent Script</label>
+                <textarea onchange="updateStep(${idx}, 'script', this.value)" style="min-height: 80px;">${step.script || ''}</textarea>
+                
+                <label>Note (Subtle Explanation)</label>
+                <input value="${step.note ? step.note.replace(/"/g, '&quot;') : ''}" onchange="updateStep(${idx}, 'note', this.value)">
+
+                <h5 style="margin-bottom: 5px; margin-top: 20px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">Buttons</h5>
+                <div id="step-buttons-${idx}"></div>
+                <button class="action" onclick="addBtnToStep(${idx})">+ Add Button</button>
+            `;
+            container.appendChild(div);
+            
+            const btnContainer = document.getElementById(`step-buttons-${idx}`);
+            if (step.buttons) {
+                step.buttons.forEach((btn, bIdx) => {
+                    const row = document.createElement('div');
+                    row.className = 'row';
+                    
+                    let btnControls = ``;
+                    btnControls += `<button class="icon-btn" title="Move Up" onclick="moveBtnUp(${idx}, ${bIdx})" ${bIdx === 0 ? 'disabled style="opacity:0.3;"' : ''}>↑</button>`;
+                    btnControls += `<button class="icon-btn" title="Move Down" onclick="moveBtnDown(${idx}, ${bIdx})" ${bIdx === step.buttons.length - 1 ? 'disabled style="opacity:0.3;"' : ''}>↓</button>`;
+                    btnControls += `<button class="icon-btn danger" title="Delete" onclick="removeBtn(${idx}, ${bIdx})">✖</button>`;
+
+                    row.innerHTML = `
+                        <input style="flex:1; margin:0;" value="${btn.label}" onchange="updateBtn(${idx}, ${bIdx}, 'label', this.value)" placeholder="Button Label">
+                        <select style="flex:1; margin:0;" onchange="updateBtn(${idx}, ${bIdx}, 'target', this.value)">
+                            <option value="reset" ${btn.target === 'reset' ? 'selected' : ''}>[RESET FLOW]</option>
+                            ${state.steps.map(s => `<option value="${s.id}" ${btn.target === s.id ? 'selected' : ''}>Step: ${s.id}</option>`).join('')}
+                        </select>
+                        <select style="width: 150px; margin:0;" onchange="updateBtn(${idx}, ${bIdx}, 'style', this.value)">
+                            <option value="btn-primary" ${btn.style === 'btn-primary' ? 'selected' : ''}>Primary</option>
+                            <option value="btn-secondary" ${btn.style === 'btn-secondary' ? 'selected' : ''}>Secondary</option>
+                            <option value="btn-success" ${btn.style === 'btn-success' ? 'selected' : ''}>Success</option>
+                            <option value="btn-danger" ${btn.style === 'btn-danger' ? 'selected' : ''}>Danger</option>
+                        </select>
+                        ${btnControls}
+                    `;
+                    btnContainer.appendChild(row);
+                });
+            }
+        });
+
+        if (stepToScroll !== null) {
+            const el = document.getElementById(`step-card-${stepToScroll}`);
+            if (el) {
+                el.style.transition = "box-shadow 0.5s ease";
+                el.style.boxShadow = "0 0 15px var(--brand-color)";
+                setTimeout(() => { el.style.boxShadow = "0 2px 10px rgba(0,0,0,0.1)"; }, 1000);
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            stepToScroll = null;
+        }
+
+        const exportState = JSON.parse(JSON.stringify(state));
+        exportState.steps.forEach(step => {
+            if (!step.alert_type) delete step.alert_type;
+            if (!step.alert_text) delete step.alert_text;
+            if (!step.note) delete step.note;
+        });
+        document.getElementById('json-output').innerText = JSON.stringify(exportState, null, 2);
+    }
+
+    function renderList(targetId, key, fields) {
+        const container = document.getElementById(targetId);
+        container.innerHTML = '';
+        state[key].forEach((item, idx) => {
+            const div = document.createElement('div');
+            div.className = 'card';
+            fields.forEach(f => {
+                div.innerHTML += `<label>${f.toUpperCase()}</label>
+                ${f === 'content' ? `<textarea onchange="updateItem('${key}', ${idx}, '${f}', this.value)">${item[f]}</textarea>` : `<input value="${item[f] ? item[f].replace(/"/g, '&quot;') : ''}" onchange="updateItem('${key}', ${idx}, '${f}', this.value)">`}`;
+            });
+            div.innerHTML += `<button class="action btn-del" onclick="deleteItem('${key}', ${idx})">Delete</button>`;
+            container.appendChild(div);
+        });
+    }
+
+    function addItem(key) { state[key].push({ id: '', label: '', content: '' }); render(); }
+    function updateItem(key, idx, field, val) { state[key][idx][field] = val; render(); }
+    function deleteItem(key, idx) { state[key].splice(idx, 1); render(); }
+    
+    function addStepAt(idx) { 
+        state.steps.splice(idx, 0, { id: 'new_step_' + Date.now().toString().slice(-4), title: 'New Step', badge: '', alert_type: '', alert_text: '', script: '', note: '', buttons: [] }); 
+        stepToScroll = idx; render(); 
+    }
+    
+    function moveStepUp(idx) {
+        if (idx <= 1) return;
+        const temp = state.steps[idx - 1]; state.steps[idx - 1] = state.steps[idx]; state.steps[idx] = temp;
+        stepToScroll = idx - 1; render();
+    }
+
+    function moveStepDown(idx) {
+        if (idx === 0 || idx >= state.steps.length - 1) return;
+        const temp = state.steps[idx + 1]; state.steps[idx + 1] = state.steps[idx]; state.steps[idx] = temp;
+        stepToScroll = idx + 1; render();
+    }
+
+    function updateStep(idx, field, val) {
+        if(field === 'id' && val === 'reset') { alert('ID cannot be "reset"'); return; }
+        state.steps[idx][field] = val; render();
+    }
+    
+    function deleteStep(idx) { if(idx > 0 && confirm("Delete this step?")) { state.steps.splice(idx, 1); render(); } }
+    
+    function addBtnToStep(sIdx) { 
+        if (!state.steps[sIdx].buttons) state.steps[sIdx].buttons = [];
+        state.steps[sIdx].buttons.push({ label: 'New Button', target: 'reset', style: 'btn-primary' }); 
+        render(); 
+    }
+    
+    function moveBtnUp(sIdx, bIdx) {
+        if (bIdx === 0) return;
+        const temp = state.steps[sIdx].buttons[bIdx - 1]; state.steps[sIdx].buttons[bIdx - 1] = state.steps[sIdx].buttons[bIdx]; state.steps[sIdx].buttons[bIdx] = temp; render();
+    }
+
+    function moveBtnDown(sIdx, bIdx) {
+        if (bIdx >= state.steps[sIdx].buttons.length - 1) return;
+        const temp = state.steps[sIdx].buttons[bIdx + 1]; state.steps[sIdx].buttons[bIdx + 1] = state.steps[sIdx].buttons[bIdx]; state.steps[sIdx].buttons[bIdx] = temp; render();
+    }
+
+    function updateBtn(sIdx, bIdx, field, val) { state.steps[sIdx].buttons[bIdx][field] = val; render(); }
+    function removeBtn(sIdx, bIdx) { state.steps[sIdx].buttons.splice(bIdx, 1); render(); }
+
+    function copyJSON() {
+        navigator.clipboard.writeText(document.getElementById('json-output').innerText);
+        alert('JSON copied to clipboard!');
+    }
+
+    function importJSON() {
+        try {
+            const parsed = JSON.parse(document.getElementById('import-area').value);
+            if(!parsed.steps || parsed.steps[0].id !== 'step_1') throw new Error('First step must be step_1');
+            state = parsed; render(); alert('JSON loaded successfully!');
+        } catch(e) { alert('Invalid JSON: ' + e.message); }
+    }
+
+    render();
+</script>
+</body>
+</html>
