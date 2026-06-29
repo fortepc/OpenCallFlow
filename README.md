@@ -19,7 +19,7 @@ Whether you are handling high-volume inbound sales campaigns for organizations l
 You can test the tools directly in your browser using GitHub Pages (no installation required):
 
 * **Agent Interface Demo:** [Test the live Agent view here](https://fortepc.github.io/OpenCallFlow/agent.html)
-* **Manager Configurator Demo:** [Test the live Manager view here](https://fortepc.github.io/OpenCallFlow/manager.html)
+* **Manager Configurator Demo:** [Test the live Manager view here](https://fortepc.github.io/OpenCallFlow/manager.htm)
 * 
 
 ---
