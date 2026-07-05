@@ -656,10 +656,34 @@
         }
 
         function applyHotfix() {
-            try { appConfig = JSON.parse(document.getElementById('hotfix-input').value); initSidebar(); initFlow(); closeModal(); } catch(e) { alert("Invalid JSON!"); }
+            try { 
+                const newConfig = JSON.parse(document.getElementById('hotfix-input').value);
+                appConfig = newConfig;
+                
+                // Save to localStorage so it persists on refresh
+                localStorage.setItem('appConfig', JSON.stringify(appConfig));
+                
+                initSidebar(); 
+                initFlow(); 
+                closeModal(); 
+            } catch(e) { 
+                alert("Invalid JSON!"); 
+            }
         }
 
-        window.onload = () => { initSidebar(); initFlow(); };
+        window.onload = () => {
+            // Attempt to load from localStorage first
+            const savedConfig = localStorage.getItem('appConfig');
+            if (savedConfig) {
+                try {
+                    appConfig = JSON.parse(savedConfig);
+                } catch (e) {
+                    console.error("Failed to parse saved config, using default.");
+                }
+            }
+            initSidebar(); 
+            initFlow(); 
+        };
     </script>
 </body>
 </html>
