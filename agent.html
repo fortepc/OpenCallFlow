@@ -531,7 +531,10 @@
                 currentPath = currentPath.slice(0, pathIndex + 1);
             }
 
+            const now = new Date().toLocaleTimeString();
+
             currentPath[currentPath.length - 1].label = label;
+            currentPath[currentPath.length - 1].timestamp = now;
             currentPath.push({ id: targetId, title: flowMap[targetId].title, label: '...' });
 
             const card = document.getElementById(`card-${currentId}`);
