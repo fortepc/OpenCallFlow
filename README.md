@@ -14,9 +14,9 @@ OpenCallFlow replaces rigid scripts with an interactive conversational blueprint
 * **Objection-Handling "Panic Buttons":** Keep rebuttals for common hurdles (like *"Price is too high"* or *"I have to talk to my husband/wife"*) permanently visible in the sidebar so agents never freeze.
 
 ### How to Create & Deploy Scripts:
-1. **Design visually:** Open `manager.htm` in any browser to build your tree step-by-step. Start your script at `step_1`.
-2. **Export the flow:** Go to the **JSON Export/Import** tab and click **Copy to Clipboard**.
-3. **Use that JSON to update agent.html:** Either update the hard coded `appConfig` in the agent.html or send that JSON code to your agents. They can click **⚙️ Hotfix Config** in their agent sidebar, paste it, and click **Apply** to refresh their script instantly.
+1. **Design the flow:** Open `manager.htm` in a browser and select **Flow Canvas**. Start at `step_1`, drag nodes to arrange the map, and connect a button output to a step input to set that response's destination. Select a node to edit its script, alerts, and ordered response buttons.
+2. **Export the flow:** Open **JSON Import/Export** and copy the configuration. The optional `canvas` property preserves node positions; the agent ignores it and continues to use the existing step and button fields.
+3. **Update the agent:** Paste the JSON into the hard-coded `appConfig` in `agent.html`, or send it to agents to apply through **⚙️ Hotfix Config** in the agent sidebar.
 4. **Performance Reviews:** Have agents use the **📜 View Call History** button to review their exact conversational path and timestamps for self-coaching or QA sessions.
 
 ---
@@ -46,7 +46,7 @@ OpenCallFlow is a client-side utility built entirely with vanilla HTML5, CSS3, a
 ### Technical Specifications:
 * **Stack:** Vanilla JS (ES6+), HTML5, CSS3. No external CDNs or third-party dependencies.
 * **Deployment:** Can be run locally as flat files on agent machines or hosted statically on an internal secure web server (IIS/Apache) or GitHub Pages.
-* **Permanent Configuration:** To lock down a script baseline across the enterprise, paste your generated JSON object directly into the `let appConfig = {...};` block inside the `agent.htm` source file.
+* **Permanent Configuration:** To lock down a script baseline across the enterprise, paste your generated JSON object directly into the `let appConfig = {...};` block inside the `agent.html` source file.
 
 ---
 

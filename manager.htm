@@ -4,51 +4,147 @@
     <meta charset="UTF-8">
     <title>OpenCallFlow Configurator</title>
     <style>
-        :root { --brand-color: #0056b3; --dark-bg: #1a1a1a; --light-bg: #F5F5F7; --text-color: #333333; }
-        body { font-family: sans-serif; background: var(--light-bg); margin: 0; display: flex; height: 100vh; }
-        
-        #sidebar { width: 250px; background: var(--dark-bg); color: white; padding: 20px; flex-shrink: 0; }
-        .nav-btn { display: block; width: 100%; padding: 12px; margin-bottom: 10px; background: #333; color: #ddd; border: none; cursor: pointer; text-align: left; border-radius: 4px; }
-        .nav-btn.active { background: var(--brand-color); color: white; }
-        
-        #main { flex: 1; padding: 30px; overflow-y: auto; scroll-behavior: smooth; }
-        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        
-        label { display: block; font-weight: bold; margin: 15px 0 5px; font-size: 0.85rem; color: #555; }
-        input, textarea, select { width: 100%; padding: 10px; margin-bottom: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        textarea { resize: vertical; min-height: 60px; }
-        .row { display: flex; gap: 8px; align-items: center; border-bottom: 1px solid #eee; padding: 10px 0; }
-        
-        button.action { padding: 8px 15px; border-radius: 4px; cursor: pointer; border: none; font-weight: bold; margin-top: 10px;}
-        .btn-add { background: var(--brand-color); color: white; }
-        .btn-del { background: #ff4d4d; color: white; }
-        
-        .icon-btn { padding: 6px 10px; cursor: pointer; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-weight: bold; display: flex; align-items: center; justify-content: center; }
-        .icon-btn:hover { background: #eee; }
-        .icon-btn.danger { color: #ff4d4d; border-color: #ffb3b3; }
-        .icon-btn.danger:hover { background: #ffeeee; }
-        
-        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #ddd; padding-bottom: 10px; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        
-        pre { background: #eee; padding: 15px; border-radius: 5px; white-space: pre-wrap; word-break: break-all; }
-
-        .dropdown { position: relative; display: inline-block; }
-        .dropdown-content { display: none; position: absolute; right: 0; background-color: white; min-width: 140px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); z-index: 1; border-radius: 4px; overflow: hidden; border: 1px solid #ccc;}
-        .dropdown-content button { color: black; padding: 10px 16px; text-decoration: none; display: block; width: 100%; text-align: left; border: none; background: none; cursor: pointer; border-bottom: 1px solid #eee;}
-        .dropdown-content button:hover { background-color: #f1f1f1; }
-        .show { display: block; }
+        :root {
+            --ink: #1d292b;
+            --muted: #687578;
+            --paper: #f2f4f1;
+            --panel: #ffffff;
+            --line: #d7dfdc;
+            --teal: #087e78;
+            --teal-dark: #075b58;
+            --coral: #c35443;
+            --gold: #d49a33;
+            --sidebar: #192426;
+        }
+        * { box-sizing: border-box; }
+        body { font-family: "Trebuchet MS", "Segoe UI", sans-serif; color: var(--ink); background: var(--paper); margin: 0; display: flex; height: 100vh; overflow: hidden; }
+        button, input, textarea, select { font: inherit; }
+        button { cursor: pointer; }
+        #sidebar { width: 226px; background: var(--sidebar); color: #f4f6f2; padding: 24px 16px; flex: 0 0 226px; }
+        .brand { display: flex; align-items: center; gap: 10px; margin: 0 8px 30px; }
+        .brand-mark { width: 29px; height: 29px; display: grid; place-items: center; border: 2px solid #7ed0ba; border-radius: 50%; color: #a4e1ce; font-size: 15px; font-weight: 800; }
+        .brand h1 { font-size: 15px; line-height: 1.15; margin: 0; letter-spacing: 0; }
+        .nav-caption { color: #98a7a5; font-size: 10px; text-transform: uppercase; margin: 0 10px 10px; letter-spacing: 1px; }
+        .nav-btn { display: flex; align-items: center; gap: 11px; width: 100%; padding: 11px 10px; margin: 3px 0; background: transparent; color: #d6dfdc; border: 0; border-radius: 5px; text-align: left; font-size: 13px; }
+        .nav-btn:hover { background: #263638; color: white; }
+        .nav-btn.active { background: #d4eee5; color: #173c38; font-weight: 700; }
+        .nav-glyph { width: 18px; text-align: center; font-size: 16px; line-height: 1; }
+        #main { flex: 1; min-width: 0; padding: 22px 26px 26px; overflow: auto; }
+        .tab-content { min-height: 100%; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 16px; border-bottom: 1px solid var(--line); padding-bottom: 13px; }
+        .eyebrow { color: var(--teal); font-weight: 800; text-transform: uppercase; font-size: 10px; letter-spacing: 1.1px; margin: 0 0 5px; }
+        h2 { font-size: 23px; margin: 0; letter-spacing: 0; }
+        .section-subtitle { color: var(--muted); font-size: 12px; margin: 5px 0 0; }
+        .action { padding: 9px 13px; border-radius: 4px; cursor: pointer; border: 1px solid transparent; font-weight: 700; font-size: 12px; }
+        .btn-add { background: var(--teal); color: white; }
+        .btn-add:hover { background: var(--teal-dark); }
+        .btn-muted { background: white; color: var(--ink); border-color: var(--line); }
+        .btn-muted:hover { background: #f1f5f2; }
+        .card { background: var(--panel); padding: 20px; border: 1px solid var(--line); border-radius: 5px; margin-bottom: 14px; }
+        label { display: block; font-weight: 700; margin: 13px 0 5px; font-size: 11px; color: #536164; }
+        input, textarea, select { width: 100%; padding: 9px 10px; margin-bottom: 3px; border: 1px solid #cbd5d2; border-radius: 4px; background: #fff; color: var(--ink); font-size: 12px; }
+        input:focus, textarea:focus, select:focus { outline: 2px solid #9ed5c6; border-color: var(--teal); }
+        textarea { resize: vertical; min-height: 68px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .row { display: flex; gap: 8px; align-items: center; border-bottom: 1px solid #e8eeeb; padding: 8px 0; }
+        .btn-del { background: #fff0ed; color: #a33c30; border-color: #edc2ba; }
+        .section-card { max-width: 820px; }
+        pre { background: #e8eeeb; padding: 15px; border-radius: 4px; white-space: pre-wrap; word-break: break-word; font-size: 11px; }
+        #section-steps { height: 100%; min-height: 0; display: flex; flex-direction: column; }
+        .flow-header { flex: 0 0 auto; }
+        .flow-tools { display: flex; align-items: center; gap: 7px; }
+        .tool-btn { width: 34px; height: 34px; border: 1px solid var(--line); background: white; color: var(--ink); border-radius: 4px; font-size: 17px; }
+        .tool-btn:hover { border-color: var(--teal); color: var(--teal-dark); }
+        .graph-layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 14px; flex: 1; min-height: 0; }
+        .graph-column { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+        .graph-hint { display: flex; justify-content: space-between; gap: 12px; padding: 9px 12px; color: #5b6969; font-size: 11px; border: 1px solid var(--line); border-bottom: 0; background: #fbfcfa; }
+        #connection-status { font-weight: 700; color: var(--teal-dark); text-align: right; }
+        #graph-viewport { position: relative; overflow: hidden; flex: 1; min-height: 390px; border: 1px solid #cbd5d1; background-color: #e8eeeb; background-image: radial-gradient(#bdcbc6 0.8px, transparent 0.8px); background-size: 20px 20px; cursor: grab; touch-action: none; }
+        #graph-viewport.panning { cursor: grabbing; }
+        #graph-world { position: absolute; left: 0; top: 0; width: 5000px; height: 4000px; transform-origin: 0 0; }
+        #graph-edges { position: absolute; inset: 0; width: 5000px; height: 4000px; overflow: visible; pointer-events: none; }
+        .graph-node { position: absolute; width: 254px; background: #fff; border: 1px solid #b9c9c4; border-radius: 5px; box-shadow: 0 5px 14px #233a351c; z-index: 1; }
+        .graph-node.selected { border: 2px solid var(--teal); box-shadow: 0 0 0 3px #087e781d, 0 7px 16px #233a3524; }
+        .node-header { padding: 9px 11px 7px; border-bottom: 1px solid #e4ebe8; cursor: grab; touch-action: none; }
+        .node-header:active { cursor: grabbing; }
+        .node-topline { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px; }
+        .node-id { color: #5f6e70; font: 700 10px/1.2 Consolas, monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .node-chip { background: #dff1e9; color: #155e53; padding: 3px 6px; border-radius: 3px; font-size: 9px; font-weight: 800; white-space: nowrap; }
+        .node-chip.entry { background: #f9e6bf; color: #78500e; }
+        .node-title { font-weight: 800; font-size: 13px; overflow-wrap: anywhere; }
+        .node-delete { width: 23px; height: 23px; border: 0; background: transparent; color: #9a5a51; font-size: 17px; line-height: 1; border-radius: 3px; }
+        .node-delete:hover { background: #fff0ed; }
+        .node-badge { height: 25px; padding: 6px 11px 3px; color: #71807e; font-size: 10px; border-bottom: 1px solid #eef2f0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .node-outputs { padding: 3px 0 5px; }
+        .output-row { height: 34px; padding: 0 0 0 11px; display: flex; align-items: center; justify-content: space-between; gap: 6px; border-bottom: 1px solid #f0f3f1; font-size: 10px; }
+        .output-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; }
+        .output-target { color: #71807e; font-size: 9px; white-space: nowrap; max-width: 95px; overflow: hidden; text-overflow: ellipsis; }
+        .port { flex: 0 0 15px; width: 15px; height: 15px; padding: 0; border: 2px solid var(--teal); border-radius: 50%; background: #fff; z-index: 2; }
+        .port:hover, .port.connecting { background: #80cbb2; box-shadow: 0 0 0 4px #087e781f; }
+        .node-input { position: absolute; width: 14px; height: 14px; left: -8px; top: 19px; }
+        .reset-node { position: absolute; width: 174px; min-height: 58px; display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid #d6a19a; border-radius: 5px; color: #762f28; background: #fff5f2; box-shadow: 0 5px 14px #233a351c; z-index: 1; cursor: default; }
+        .reset-node .node-input { top: 21px; border-color: var(--coral); }
+        .reset-symbol { width: 30px; height: 30px; display: grid; place-items: center; border: 1px solid #e7b6ac; border-radius: 50%; font-size: 19px; }
+        .reset-title { font-size: 12px; font-weight: 800; }
+        .reset-caption { color: #9b645c; font-size: 9px; margin-top: 3px; }
+        .edge-label { font: 700 11px "Trebuchet MS", sans-serif; fill: #314342; paint-order: stroke; stroke: #e8eeeb; stroke-width: 5px; stroke-linejoin: round; }
+        .inspector { min-height: 0; overflow: auto; background: #fff; border: 1px solid var(--line); border-radius: 5px; padding: 14px; }
+        .inspector-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; border-bottom: 1px solid #e5ece8; padding-bottom: 10px; margin-bottom: 4px; }
+        .inspector-head h3 { margin: 0; font-size: 14px; }
+        .inspector-empty { color: var(--muted); font-size: 12px; line-height: 1.6; padding: 16px 2px; }
+        .inspector textarea { min-height: 78px; }
+        .button-editor { border-top: 1px solid #e7ece9; margin-top: 12px; padding-top: 4px; }
+        .button-editor-head { display: flex; justify-content: space-between; align-items: center; }
+        .button-editor-head h4 { font-size: 12px; margin: 9px 0 3px; }
+        .button-item { background: #f7f9f7; border: 1px solid #e0e7e3; border-radius: 4px; padding: 8px; margin-top: 8px; }
+        .button-item-top { display: flex; align-items: center; justify-content: space-between; color: #64716e; font-size: 10px; font-weight: 800; }
+        .button-actions { display: flex; gap: 3px; }
+        .mini-btn { width: 25px; height: 24px; border: 1px solid #d5dfda; border-radius: 3px; color: #455451; background: white; }
+        .mini-btn:hover { border-color: var(--teal); color: var(--teal-dark); }
+        .mini-btn.danger { color: #a33c30; }
+        .inspector .action { width: 100%; margin-top: 9px; }
+        .field-note { color: #788583; font-size: 10px; margin-top: 3px; line-height: 1.4; }
+        .alert-box { border: 1px solid #edc7a2; background: #fff6e8; padding: 10px; border-radius: 4px; margin-top: 10px; }
+        .list-card { background: white; padding: 18px; border: 1px solid var(--line); border-radius: 5px; margin-bottom: 12px; }
+        .list-card label { text-transform: uppercase; }
+        #section-export { max-width: 950px; }
+        @media (max-width: 1050px) {
+            #sidebar { width: 190px; flex-basis: 190px; }
+            #main { padding: 18px; }
+            .graph-layout { grid-template-columns: minmax(0, 1fr) 285px; gap: 10px; }
+        }
+        @media (max-width: 760px) {
+            body { display: block; height: 100dvh; overflow: auto; }
+            #sidebar { width: auto; padding: 12px 14px 9px; }
+            .brand { margin: 0 4px 11px; }
+            .nav-caption { display: none; }
+            .nav-list { display: flex; overflow-x: auto; gap: 4px; }
+            .nav-btn { width: auto; flex: 0 0 auto; margin: 0; padding: 9px; font-size: 11px; }
+            .nav-glyph { display: none; }
+            #main { padding: 14px; overflow: visible; }
+            #section-steps { min-height: calc(100dvh - 110px); }
+            .section-header { align-items: flex-start; }
+            h2 { font-size: 20px; }
+            .flow-tools { flex-wrap: wrap; justify-content: flex-end; }
+            .graph-layout { display: flex; flex-direction: column; }
+            #graph-viewport { flex: none; height: 58dvh; min-height: 360px; }
+            .inspector { overflow: visible; }
+            .grid-2 { grid-template-columns: 1fr; gap: 0; }
+        }
     </style>
 </head>
 <body>
 
 <div id="sidebar">
-    <h3>OpenCallFlow Config</h3>
-    <button class="nav-btn active" onclick="showSection('meta')">Global Settings</button>
-    <button class="nav-btn" onclick="showSection('panic')">Panic Buttons</button>
-    <button class="nav-btn" onclick="showSection('ref')">Reference Links</button>
-    <button class="nav-btn" onclick="showSection('steps')">Flow Steps</button>
-    <button class="nav-btn" onclick="showSection('export')">JSON Export/Import</button>
+    <div class="brand"><span class="brand-mark">O</span><h1>OpenCallFlow<br>Configurator</h1></div>
+    <p class="nav-caption">Workspace</p>
+    <div class="nav-list">
+        <button class="nav-btn active" onclick="showSection('meta', this)"><span class="nav-glyph">◷</span>Global Settings</button>
+        <button class="nav-btn" onclick="showSection('panic', this)"><span class="nav-glyph">!</span>Panic Buttons</button>
+        <button class="nav-btn" onclick="showSection('ref', this)"><span class="nav-glyph">↗</span>Reference Links</button>
+        <button class="nav-btn" onclick="showSection('steps', this)"><span class="nav-glyph">⌘</span>Flow Canvas</button>
+        <button class="nav-btn" onclick="showSection('export', this)"><span class="nav-glyph">{ }</span>JSON Import/Export</button>
+    </div>
 </div>
 
 <div id="main">
@@ -56,7 +152,7 @@
         <div class="section-header">
             <h2>Global Settings</h2>
         </div>
-        <div class="card">
+        <div class="card section-card">
             <label>Flow Version</label>
             <input id="meta-version" value="1.0.0" onchange="updateMeta('version', this.value)">
             <label>Last Updated</label>
@@ -81,11 +177,22 @@
     </div>
 
     <div id="section-steps" class="tab-content" style="display:none;">
-        <div class="section-header">
-            <h2>Flow Steps</h2>
-            <button class="action btn-add" onclick="addStepAt(state.steps.length)">+ Add Step to End</button>
+        <div class="section-header flow-header">
+            <div><p class="eyebrow">Flow designer</p><h2>Conversation map</h2><p class="section-subtitle">Arrange steps, then connect each response to its next destination.</p></div>
+            <div class="flow-tools">
+                <button class="action btn-add" onclick="addStep()">+ Add Step</button>
+                <button class="tool-btn" title="Zoom out" aria-label="Zoom out" onclick="zoomGraph(0.85)">−</button>
+                <button class="tool-btn" title="Zoom in" aria-label="Zoom in" onclick="zoomGraph(1.18)">+</button>
+                <button class="tool-btn" title="Fit graph" aria-label="Fit graph" onclick="fitGraph()">⌗</button>
+            </div>
         </div>
-        <div id="list-steps"></div>
+        <div class="graph-layout">
+            <div class="graph-column">
+                <div class="graph-hint"><span>Drag node headers to arrange the flow. Drag the canvas to pan.</span><span id="connection-status" role="status">Select an output dot, then a destination input.</span></div>
+                <div id="graph-viewport" aria-label="Flow graph canvas"></div>
+            </div>
+            <aside id="inspector" class="inspector" aria-label="Selected step properties"></aside>
+        </div>
     </div>
 
     <div id="section-export" class="tab-content" style="display:none;">
@@ -103,157 +210,37 @@
         lastUpdated: new Date().toISOString().split('T')[0],
         panicButtons: [],
         referenceLinks: [],
-        steps: [{ id: "step_1", title: "Greeting", badge: "Greeting", alert_type: "", alert_text: "", script: "", note: "", buttons: [] }]
+        steps: [{ id: "step_1", title: "Greeting", badge: "Greeting", alert_type: "", alert_text: "", script: "", note: "", buttons: [] }],
+        canvas: { nodes: { step_1: { x: 100, y: 140 } } }
     };
+    let selectedStepId = 'step_1';
+    let connectingSource = null;
+    let dragState = null;
+    let panState = null;
+    let graphHasInitialFit = false;
+    let graphView = { x: 30, y: 30, scale: 1 };
 
-    document.getElementById('meta-updated').value = state.lastUpdated;
-
-    let stepToScroll = null;
-
-    window.onclick = function(event) {
-        if (!event.target.matches('.dropbtn')) {
-            var dropdowns = document.getElementsByClassName("dropdown-content");
-            for (var i = 0; i < dropdowns.length; i++) {
-                if (dropdowns[i].classList.contains('show')) {
-                    dropdowns[i].classList.remove('show');
-                }
-            }
+    function showSection(id, button) {
+        document.querySelectorAll('.tab-content').forEach(section => section.style.display = 'none');
+        document.querySelectorAll('.nav-btn').forEach(navButton => navButton.classList.remove('active'));
+        document.getElementById('section-' + id).style.display = id === 'steps' ? 'flex' : 'block';
+        button.classList.add('active');
+        render();
+        if (id === 'steps' && !graphHasInitialFit) {
+            graphHasInitialFit = true;
+            requestAnimationFrame(fitGraph);
         }
     }
 
-    function toggleDropdown(id) { document.getElementById("dropdown-" + id).classList.toggle("show"); }
-
-    function showSection(id) {
-        document.querySelectorAll('.tab-content').forEach(s => s.style.display = 'none');
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('section-' + id).style.display = 'block';
-        event.target.classList.add('active');
-        render();
-    }
-
-    function updateMeta(field, val) { state[field] = val; render(); }
+    function updateMeta(field, value) { state[field] = value; render(); }
 
     function render() {
         document.getElementById('meta-version').value = state.version || '';
         document.getElementById('meta-updated').value = state.lastUpdated || '';
-
         renderList('list-panic', 'panicButtons', ['id', 'label', 'content']);
         renderList('list-ref', 'referenceLinks', ['id', 'label', 'content']);
-        
-        const container = document.getElementById('list-steps');
-        container.innerHTML = '';
-        state.steps.forEach((step, idx) => {
-            const div = document.createElement('div');
-            div.className = 'card';
-            div.id = `step-card-${idx}`;
-            
-            let controlsHTML = `<div style="display: flex; gap: 5px;">`;
-            if (idx > 0) {
-                if (idx > 1) controlsHTML += `<button class="icon-btn" title="Move Up" onclick="moveStepUp(${idx})">↑</button>`;
-                if (idx < state.steps.length - 1) controlsHTML += `<button class="icon-btn" title="Move Down" onclick="moveStepDown(${idx})">↓</button>`;
-                controlsHTML += `
-                    <div class="dropdown">
-                        <button class="icon-btn dropbtn" title="Add Step" onclick="toggleDropdown(${idx})">+</button>
-                        <div id="dropdown-${idx}" class="dropdown-content">
-                            <button onclick="addStepAt(${idx})">Add Step Before</button>
-                            <button onclick="addStepAt(${idx + 1})">Add Step After</button>
-                        </div>
-                    </div>
-                    <button class="icon-btn danger" title="Delete Step" onclick="deleteStep(${idx})">✖</button>
-                `;
-            } else {
-                controlsHTML += `<button class="icon-btn" title="Add Step After" onclick="addStepAt(1)">+ Add After</button>`;
-            }
-            controlsHTML += `</div>`;
-
-            div.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; margin-bottom: 10px;">
-                    <h4 style="margin: 0; color: var(--brand-color);">Step ${idx + 1}</h4>
-                    ${controlsHTML}
-                </div>
-                
-                <div class="grid-2">
-                    <div>
-                        <label>ID (Enforced: ${idx === 0 ? 'step_1' : ''})</label>
-                        <input value="${step.id || ''}" ${idx === 0 ? 'readonly' : ''} onchange="updateStep(${idx}, 'id', this.value)">
-                    </div>
-                    <div>
-                        <label>Badge</label>
-                        <input value="${step.badge || ''}" onchange="updateStep(${idx}, 'badge', this.value)" placeholder="e.g., Ask, Close">
-                    </div>
-                </div>
-
-                <label>Title</label>
-                <input value="${step.title || ''}" onchange="updateStep(${idx}, 'title', this.value)">
-                
-                <div class="grid-2" style="background: #fff3cd; padding: 10px; border-radius: 4px; margin-top: 15px; border: 1px solid #ffeeba;">
-                    <div>
-                        <label style="margin-top:0;">Alert Type</label>
-                        <select onchange="updateStep(${idx}, 'alert_type', this.value)">
-                            <option value="" ${!step.alert_type ? 'selected' : ''}>None</option>
-                            <option value="warning" ${step.alert_type === 'warning' ? 'selected' : ''}>Warning (Yellow)</option>
-                            <option value="stop" ${step.alert_type === 'stop' ? 'selected' : ''}>Stop (Red)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label style="margin-top:0;">Alert Text</label>
-                        <input value="${step.alert_text ? step.alert_text.replace(/"/g, '&quot;') : ''}" onchange="updateStep(${idx}, 'alert_text', this.value)">
-                    </div>
-                </div>
-
-                <label>Agent Script</label>
-                <textarea onchange="updateStep(${idx}, 'script', this.value)" style="min-height: 80px;">${step.script || ''}</textarea>
-                
-                <label>Note (Subtle Explanation)</label>
-                <input value="${step.note ? step.note.replace(/"/g, '&quot;') : ''}" onchange="updateStep(${idx}, 'note', this.value)">
-
-                <h5 style="margin-bottom: 5px; margin-top: 20px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">Buttons</h5>
-                <div id="step-buttons-${idx}"></div>
-                <button class="action" onclick="addBtnToStep(${idx})">+ Add Button</button>
-            `;
-            container.appendChild(div);
-            
-            const btnContainer = document.getElementById(`step-buttons-${idx}`);
-            if (step.buttons) {
-                step.buttons.forEach((btn, bIdx) => {
-                    const row = document.createElement('div');
-                    row.className = 'row';
-                    
-                    let btnControls = ``;
-                    btnControls += `<button class="icon-btn" title="Move Up" onclick="moveBtnUp(${idx}, ${bIdx})" ${bIdx === 0 ? 'disabled style="opacity:0.3;"' : ''}>↑</button>`;
-                    btnControls += `<button class="icon-btn" title="Move Down" onclick="moveBtnDown(${idx}, ${bIdx})" ${bIdx === step.buttons.length - 1 ? 'disabled style="opacity:0.3;"' : ''}>↓</button>`;
-                    btnControls += `<button class="icon-btn danger" title="Delete" onclick="removeBtn(${idx}, ${bIdx})">✖</button>`;
-
-                    row.innerHTML = `
-                        <input style="flex:1; margin:0;" value="${btn.label}" onchange="updateBtn(${idx}, ${bIdx}, 'label', this.value)" placeholder="Button Label">
-                        <select style="flex:1; margin:0;" onchange="updateBtn(${idx}, ${bIdx}, 'target', this.value)">
-                            <option value="reset" ${btn.target === 'reset' ? 'selected' : ''}>[RESET FLOW]</option>
-                            ${state.steps.map(s => `<option value="${s.id}" ${btn.target === s.id ? 'selected' : ''}>Step: ${s.id}</option>`).join('')}
-                        </select>
-                        <select style="width: 150px; margin:0;" onchange="updateBtn(${idx}, ${bIdx}, 'style', this.value)">
-                            <option value="btn-primary" ${btn.style === 'btn-primary' ? 'selected' : ''}>Primary</option>
-                            <option value="btn-secondary" ${btn.style === 'btn-secondary' ? 'selected' : ''}>Secondary</option>
-                            <option value="btn-success" ${btn.style === 'btn-success' ? 'selected' : ''}>Success</option>
-                            <option value="btn-danger" ${btn.style === 'btn-danger' ? 'selected' : ''}>Danger</option>
-                        </select>
-                        ${btnControls}
-                    `;
-                    btnContainer.appendChild(row);
-                });
-            }
-        });
-
-        if (stepToScroll !== null) {
-            const el = document.getElementById(`step-card-${stepToScroll}`);
-            if (el) {
-                el.style.transition = "box-shadow 0.5s ease";
-                el.style.boxShadow = "0 0 15px var(--brand-color)";
-                setTimeout(() => { el.style.boxShadow = "0 2px 10px rgba(0,0,0,0.1)"; }, 1000);
-                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-            stepToScroll = null;
-        }
-
+        ensureLayout();
+        renderFlow();
         const exportState = JSON.parse(JSON.stringify(state));
         exportState.steps.forEach(step => {
             if (!step.alert_type) delete step.alert_type;
@@ -268,76 +255,523 @@
         container.innerHTML = '';
         state[key].forEach((item, idx) => {
             const div = document.createElement('div');
-            div.className = 'card';
-            fields.forEach(f => {
-                div.innerHTML += `<label>${f.toUpperCase()}</label>
-                ${f === 'content' ? `<textarea onchange="updateItem('${key}', ${idx}, '${f}', this.value)">${item[f]}</textarea>` : `<input value="${item[f] ? item[f].replace(/"/g, '&quot;') : ''}" onchange="updateItem('${key}', ${idx}, '${f}', this.value)">`}`;
+            div.className = 'list-card';
+            fields.forEach(field => {
+                const label = document.createElement('label');
+                label.textContent = field.toUpperCase();
+                const input = document.createElement(field === 'content' ? 'textarea' : 'input');
+                input.value = item[field] || '';
+                input.addEventListener('change', () => updateItem(key, idx, field, input.value));
+                div.append(label, input);
             });
-            div.innerHTML += `<button class="action btn-del" onclick="deleteItem('${key}', ${idx})">Delete</button>`;
+            const remove = document.createElement('button');
+            remove.className = 'action btn-del';
+            remove.textContent = 'Delete';
+            remove.addEventListener('click', () => deleteItem(key, idx));
+            div.appendChild(remove);
             container.appendChild(div);
         });
     }
 
+    function renderFlow() {
+        const viewport = document.getElementById('graph-viewport');
+        if (!viewport) return;
+        const world = document.createElement('div');
+        world.id = 'graph-world';
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('id', 'graph-edges');
+        svg.setAttribute('viewBox', '0 0 5000 4000');
+        world.appendChild(svg);
+
+        state.steps.forEach((step, stepIndex) => world.appendChild(createStepNode(step, stepIndex)));
+        world.appendChild(createResetNode());
+        viewport.replaceChildren(world);
+        viewport.onpointerdown = startPan;
+        viewport.onwheel = zoomAtPointer;
+        viewport.onpointermove = movePointer;
+        viewport.onpointerup = endPointer;
+        viewport.onpointercancel = endPointer;
+        drawEdges();
+        applyGraphTransform();
+        renderInspector();
+        const status = document.getElementById('connection-status');
+        status.textContent = connectingSource ? 'Now select a destination input, or press Escape to cancel.' : 'Select an output dot, then a destination input.';
+    }
+
+    function createStepNode(step, stepIndex) {
+        const position = state.canvas.nodes[step.id];
+        const node = document.createElement('article');
+        node.className = 'graph-node' + (step.id === selectedStepId ? ' selected' : '');
+        node.style.left = position.x + 'px';
+        node.style.top = position.y + 'px';
+        node.dataset.stepId = step.id;
+
+        const input = document.createElement('button');
+        input.className = 'port node-input';
+        input.title = 'Connect here';
+        input.setAttribute('aria-label', 'Connect to ' + step.id);
+        input.addEventListener('click', event => { event.stopPropagation(); finishConnection(step.id); });
+        node.appendChild(input);
+
+        const header = document.createElement('div');
+        header.className = 'node-header';
+        const topline = document.createElement('div');
+        topline.className = 'node-topline';
+        const id = document.createElement('span');
+        id.className = 'node-id';
+        id.textContent = step.id;
+        const chip = document.createElement('span');
+        chip.className = 'node-chip' + (stepIndex === 0 ? ' entry' : '');
+        chip.textContent = stepIndex === 0 ? 'START' : 'STEP';
+        topline.append(id, chip);
+        if (stepIndex > 0) {
+            const remove = document.createElement('button');
+            remove.className = 'node-delete';
+            remove.type = 'button';
+            remove.title = 'Delete step';
+            remove.setAttribute('aria-label', 'Delete ' + step.id);
+            remove.textContent = '×';
+            remove.addEventListener('pointerdown', event => event.stopPropagation());
+            remove.addEventListener('click', event => { event.stopPropagation(); deleteStep(step.id); });
+            topline.appendChild(remove);
+        }
+        const title = document.createElement('div');
+        title.className = 'node-title';
+        title.textContent = step.title || 'Untitled step';
+        header.append(topline, title);
+        header.addEventListener('pointerdown', event => startNodeDrag(event, step.id));
+        node.addEventListener('click', () => { selectedStepId = step.id; renderFlow(); });
+        node.appendChild(header);
+
+        const badge = document.createElement('div');
+        badge.className = 'node-badge';
+        badge.textContent = step.badge || 'No badge';
+        node.appendChild(badge);
+
+        const outputs = document.createElement('div');
+        outputs.className = 'node-outputs';
+        step.buttons.forEach((button, buttonIndex) => {
+            const row = document.createElement('div');
+            row.className = 'output-row';
+            const label = document.createElement('span');
+            label.className = 'output-label';
+            label.textContent = button.label || 'Unlabeled button';
+            const destination = document.createElement('span');
+            destination.className = 'output-target';
+            destination.textContent = button.target === 'reset' ? 'Reset flow' : button.target;
+            const port = document.createElement('button');
+            port.type = 'button';
+            port.className = 'port' + (connectingSource && connectingSource.stepId === step.id && connectingSource.buttonIndex === buttonIndex ? ' connecting' : '');
+            port.title = 'Connect ' + (button.label || 'button') + ' to a step';
+            port.setAttribute('aria-label', 'Connect output ' + (button.label || (buttonIndex + 1)) + ' from ' + step.id);
+            port.addEventListener('pointerdown', event => event.stopPropagation());
+            port.addEventListener('click', event => { event.stopPropagation(); beginConnection(step.id, buttonIndex); });
+            row.append(label, destination, port);
+            outputs.appendChild(row);
+        });
+        if (!step.buttons.length) {
+            const empty = document.createElement('div');
+            empty.className = 'output-row';
+            empty.style.color = '#82908d';
+            empty.textContent = 'No response buttons';
+            outputs.appendChild(empty);
+        }
+        node.appendChild(outputs);
+        return node;
+    }
+
+    function createResetNode() {
+        const reset = document.createElement('div');
+        reset.className = 'reset-node';
+        reset.style.left = '760px';
+        reset.style.top = '145px';
+        const input = document.createElement('button');
+        input.className = 'port node-input';
+        input.title = 'Connect to flow reset';
+        input.setAttribute('aria-label', 'Connect to reset flow');
+        input.addEventListener('click', event => { event.stopPropagation(); finishConnection('reset'); });
+        const symbol = document.createElement('span');
+        symbol.className = 'reset-symbol';
+        symbol.textContent = '↺';
+        const text = document.createElement('div');
+        const title = document.createElement('div');
+        title.className = 'reset-title';
+        title.textContent = 'Reset flow';
+        const caption = document.createElement('div');
+        caption.className = 'reset-caption';
+        caption.textContent = 'End call and start over';
+        text.append(title, caption);
+        reset.append(input, symbol, text);
+        return reset;
+    }
+
+    function drawEdges() {
+        const svg = document.getElementById('graph-edges');
+        if (!svg) return;
+        svg.replaceChildren();
+        const defs = document.createElementNS(svg.namespaceURI, 'defs');
+        const marker = document.createElementNS(svg.namespaceURI, 'marker');
+        marker.setAttribute('id', 'edge-arrow');
+        marker.setAttribute('markerWidth', '8');
+        marker.setAttribute('markerHeight', '8');
+        marker.setAttribute('refX', '7');
+        marker.setAttribute('refY', '4');
+        marker.setAttribute('orient', 'auto');
+        const arrow = document.createElementNS(svg.namespaceURI, 'path');
+        arrow.setAttribute('d', 'M0,0 L8,4 L0,8 z');
+        arrow.setAttribute('fill', '#5c7772');
+        marker.appendChild(arrow);
+        defs.appendChild(marker);
+        svg.appendChild(defs);
+
+        state.steps.forEach(step => step.buttons.forEach((button, buttonIndex) => {
+            const source = state.canvas.nodes[step.id];
+            const target = button.target === 'reset' ? { x: 760, y: 145 } : state.canvas.nodes[button.target];
+            if (!source || !target) return;
+            const startX = source.x + 254;
+            const startY = source.y + 121 + buttonIndex * 34;
+            const endX = target.x;
+            const endY = button.target === 'reset' ? target.y + 28 : target.y + 26;
+            const curve = Math.max(70, Math.abs(endX - startX) * 0.45);
+            const path = document.createElementNS(svg.namespaceURI, 'path');
+            const pathId = 'edge-' + stepIndexSafe(step.id) + '-' + buttonIndex;
+            path.setAttribute('id', pathId);
+            path.setAttribute('d', `M ${startX} ${startY} C ${startX + curve} ${startY}, ${endX - curve} ${endY}, ${endX} ${endY}`);
+            path.setAttribute('fill', 'none');
+            path.setAttribute('stroke', edgeColor(button.style));
+            path.setAttribute('stroke-width', '2.5');
+            path.setAttribute('marker-end', 'url(#edge-arrow)');
+            svg.appendChild(path);
+            if (button.label) {
+                const text = document.createElementNS(svg.namespaceURI, 'text');
+                text.setAttribute('class', 'edge-label');
+                text.setAttribute('text-anchor', 'middle');
+                const textPath = document.createElementNS(svg.namespaceURI, 'textPath');
+                textPath.setAttribute('href', '#' + pathId);
+                textPath.setAttribute('startOffset', '50%');
+                textPath.textContent = button.label;
+                text.appendChild(textPath);
+                svg.appendChild(text);
+            }
+        }));
+        if (connectingSource && connectingSource.pointer) {
+            const source = state.canvas.nodes[connectingSource.stepId];
+            const startX = source.x + 254;
+            const startY = source.y + 121 + connectingSource.buttonIndex * 34;
+            const preview = document.createElementNS(svg.namespaceURI, 'path');
+            preview.setAttribute('d', `M ${startX} ${startY} C ${startX + 80} ${startY}, ${connectingSource.pointer.x - 80} ${connectingSource.pointer.y}, ${connectingSource.pointer.x} ${connectingSource.pointer.y}`);
+            preview.setAttribute('fill', 'none');
+            preview.setAttribute('stroke', '#087e78');
+            preview.setAttribute('stroke-width', '2');
+            preview.setAttribute('stroke-dasharray', '6 5');
+            svg.appendChild(preview);
+        }
+    }
+
+    function stepIndexSafe(id) {
+        return state.steps.findIndex(step => step.id === id);
+    }
+
+    function edgeColor(style) {
+        if (style === 'btn-success') return '#23846c';
+        if (style === 'btn-danger') return '#c35443';
+        if (style === 'btn-warning') return '#ca8b21';
+        if (style === 'btn-secondary') return '#71817d';
+        return '#087e78';
+    }
+
+    function renderInspector() {
+        const inspector = document.getElementById('inspector');
+        const step = state.steps.find(item => item.id === selectedStepId);
+        if (!step) {
+            inspector.innerHTML = '<div class="inspector-empty">Select a node to edit its conversation content and response buttons.</div>';
+            return;
+        }
+        const safe = value => String(value == null ? '' : value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        const styleOptions = ['btn-primary', 'btn-secondary', 'btn-success', 'btn-danger', 'btn-warning'];
+        inspector.innerHTML = `
+            <div class="inspector-head"><div><p class="eyebrow">Selected node</p><h3>${safe(step.title || 'Untitled step')}</h3></div>${step.id === 'step_1' ? '<span class="node-chip entry">START</span>' : ''}</div>
+            <label>Step ID</label><input data-step-field="id" value="${safe(step.id)}" ${step.id === 'step_1' ? 'readonly' : ''}>
+            <label>Title</label><input data-step-field="title" value="${safe(step.title)}">
+            <label>Badge</label><input data-step-field="badge" value="${safe(step.badge)}">
+            <div class="alert-box"><div class="grid-2"><div><label style="margin-top:0">Alert type</label><select data-step-field="alert_type"><option value="" ${!step.alert_type ? 'selected' : ''}>None</option><option value="warning" ${step.alert_type === 'warning' ? 'selected' : ''}>Warning</option><option value="stop" ${step.alert_type === 'stop' ? 'selected' : ''}>Stop</option></select></div><div><label style="margin-top:0">Alert text</label><input data-step-field="alert_text" value="${safe(step.alert_text)}"></div></div></div>
+            <label>Agent script</label><textarea data-step-field="script">${safe(step.script)}</textarea>
+            <label>Note</label><input data-step-field="note" value="${safe(step.note)}">
+            <div class="button-editor"><div class="button-editor-head"><h4>Response buttons</h4><span class="field-note">Order is preserved</span></div>
+                ${step.buttons.map((button, index) => `<div class="button-item"><div class="button-item-top"><span>BUTTON ${index + 1}</span><span class="button-actions"><button class="mini-btn" data-button-action="up" data-index="${index}" title="Move up" ${index === 0 ? 'disabled' : ''}>↑</button><button class="mini-btn" data-button-action="down" data-index="${index}" title="Move down" ${index === step.buttons.length - 1 ? 'disabled' : ''}>↓</button><button class="mini-btn danger" data-button-action="delete" data-index="${index}" title="Delete button">×</button></span></div>
+                    <label>Button label</label><input data-button-field="label" data-index="${index}" value="${safe(button.label)}">
+                    <label>Destination</label><select data-button-field="target" data-index="${index}"><option value="reset" ${button.target === 'reset' ? 'selected' : ''}>Reset flow</option>${state.steps.map(target => `<option value="${safe(target.id)}" ${button.target === target.id ? 'selected' : ''}>${safe(target.id)} · ${safe(target.title)}</option>`).join('')}</select>
+                    <label>Button style</label><select data-button-field="style" data-index="${index}">${styleOptions.map(style => `<option value="${style}" ${button.style === style ? 'selected' : ''}>${style.replace('btn-', '')}</option>`).join('')}${styleOptions.includes(button.style) ? '' : `<option value="${safe(button.style)}" selected>${safe(button.style)}</option>`}</select>
+                </div>`).join('')}
+                <button class="action btn-muted" data-button-action="add">+ Add response button</button>
+            </div>`;
+        inspector.querySelectorAll('[data-step-field]').forEach(field => field.addEventListener('change', () => updateStepField(field.dataset.stepField, field.value)));
+        inspector.querySelectorAll('[data-button-field]').forEach(field => field.addEventListener('change', () => updateButtonField(Number(field.dataset.index), field.dataset.buttonField, field.value)));
+        inspector.querySelectorAll('[data-button-action]').forEach(button => button.addEventListener('click', () => handleButtonAction(button.dataset.buttonAction, Number(button.dataset.index))));
+    }
+
+    function updateStepField(field, value) {
+        const step = state.steps.find(item => item.id === selectedStepId);
+        if (!step) return;
+        if (field === 'id') {
+            const nextId = value.trim();
+            if (!nextId || nextId === 'reset' || state.steps.some(item => item.id === nextId)) {
+                alert('Step IDs must be unique, non-empty, and cannot be "reset".');
+                renderFlow();
+                return;
+            }
+            const previousId = step.id;
+            step.id = nextId;
+            state.steps.forEach(item => item.buttons.forEach(button => { if (button.target === previousId) button.target = nextId; }));
+            state.canvas.nodes[nextId] = state.canvas.nodes[previousId];
+            delete state.canvas.nodes[previousId];
+            selectedStepId = nextId;
+        } else {
+            step[field] = value;
+        }
+        render();
+    }
+
+    function updateButtonField(index, field, value) {
+        const step = state.steps.find(item => item.id === selectedStepId);
+        if (!step || !step.buttons[index]) return;
+        step.buttons[index][field] = value;
+        render();
+    }
+
+    function handleButtonAction(action, index) {
+        const step = state.steps.find(item => item.id === selectedStepId);
+        if (!step) return;
+        if (action === 'add') step.buttons.push({ label: 'New Button', target: 'reset', style: 'btn-primary' });
+        if (action === 'delete') step.buttons.splice(index, 1);
+        if (action === 'up' && index > 0) [step.buttons[index - 1], step.buttons[index]] = [step.buttons[index], step.buttons[index - 1]];
+        if (action === 'down' && index < step.buttons.length - 1) [step.buttons[index + 1], step.buttons[index]] = [step.buttons[index], step.buttons[index + 1]];
+        render();
+    }
+
+    function beginConnection(stepId, buttonIndex) {
+        connectingSource = { stepId, buttonIndex, pointer: null };
+        renderFlow();
+    }
+
+    function finishConnection(targetId) {
+        if (!connectingSource) return;
+        const source = state.steps.find(step => step.id === connectingSource.stepId);
+        if (source && source.buttons[connectingSource.buttonIndex]) source.buttons[connectingSource.buttonIndex].target = targetId;
+        connectingSource = null;
+        render();
+    }
+
+    function startNodeDrag(event, stepId) {
+        if (event.button !== 0 || event.target.closest('button')) return;
+        event.preventDefault();
+        event.stopPropagation();
+        selectedStepId = stepId;
+        const position = state.canvas.nodes[stepId];
+        dragState = { stepId, startX: event.clientX, startY: event.clientY, nodeX: position.x, nodeY: position.y };
+        renderInspector();
+        document.querySelectorAll('.graph-node').forEach(node => node.classList.toggle('selected', node.dataset.stepId === stepId));
+    }
+
+    function startPan(event) {
+        if (event.button !== 0 || event.target.closest('.graph-node, .reset-node')) return;
+        panState = { startX: event.clientX, startY: event.clientY, viewX: graphView.x, viewY: graphView.y };
+        document.getElementById('graph-viewport').classList.add('panning');
+        event.preventDefault();
+    }
+
+    function movePointer(event) {
+        if (dragState) {
+            const position = state.canvas.nodes[dragState.stepId];
+            position.x = Math.max(10, dragState.nodeX + (event.clientX - dragState.startX) / graphView.scale);
+            position.y = Math.max(10, dragState.nodeY + (event.clientY - dragState.startY) / graphView.scale);
+            const node = [...document.querySelectorAll('.graph-node')].find(item => item.dataset.stepId === dragState.stepId);
+            if (node) { node.style.left = position.x + 'px'; node.style.top = position.y + 'px'; }
+            drawEdges();
+        } else if (panState) {
+            graphView.x = panState.viewX + event.clientX - panState.startX;
+            graphView.y = panState.viewY + event.clientY - panState.startY;
+            applyGraphTransform();
+        } else if (connectingSource) {
+            const viewport = document.getElementById('graph-viewport');
+            const bounds = viewport.getBoundingClientRect();
+            connectingSource.pointer = { x: (event.clientX - bounds.left - graphView.x) / graphView.scale, y: (event.clientY - bounds.top - graphView.y) / graphView.scale };
+            drawEdges();
+        }
+    }
+
+    function endPointer() {
+        dragState = null;
+        panState = null;
+        const viewport = document.getElementById('graph-viewport');
+        if (viewport) viewport.classList.remove('panning');
+    }
+
+    function applyGraphTransform() {
+        const world = document.getElementById('graph-world');
+        if (world) world.style.transform = `translate(${graphView.x}px, ${graphView.y}px) scale(${graphView.scale})`;
+    }
+
+    function zoomGraph(factor) {
+        const viewport = document.getElementById('graph-viewport');
+        const bounds = viewport.getBoundingClientRect();
+        zoomAt(bounds.left + bounds.width / 2, bounds.top + bounds.height / 2, factor);
+    }
+
+    function zoomAtPointer(event) {
+        event.preventDefault();
+        zoomAt(event.clientX, event.clientY, event.deltaY < 0 ? 1.1 : 0.9);
+    }
+
+    function zoomAt(clientX, clientY, factor) {
+        const viewport = document.getElementById('graph-viewport');
+        const bounds = viewport.getBoundingClientRect();
+        const localX = clientX - bounds.left;
+        const localY = clientY - bounds.top;
+        const graphX = (localX - graphView.x) / graphView.scale;
+        const graphY = (localY - graphView.y) / graphView.scale;
+        graphView.scale = Math.min(1.8, Math.max(0.45, graphView.scale * factor));
+        graphView.x = localX - graphX * graphView.scale;
+        graphView.y = localY - graphY * graphView.scale;
+        applyGraphTransform();
+    }
+
+    function fitGraph() {
+        const viewport = document.getElementById('graph-viewport');
+        if (!viewport) return;
+        const positions = state.steps.map(step => state.canvas.nodes[step.id]).concat([{ x: 760, y: 145 }]);
+        const minX = Math.min(...positions.map(position => position.x));
+        const minY = Math.min(...positions.map(position => position.y));
+        const maxX = Math.max(...positions.map(position => position.x + 254));
+        const maxY = Math.max(...positions.map(position => position.y + 180));
+        const bounds = viewport.getBoundingClientRect();
+        graphView.scale = Math.min(1.15, Math.max(0.45, Math.min((bounds.width - 80) / (maxX - minX), (bounds.height - 80) / (maxY - minY))));
+        graphView.x = (bounds.width - (maxX - minX) * graphView.scale) / 2 - minX * graphView.scale;
+        graphView.y = (bounds.height - (maxY - minY) * graphView.scale) / 2 - minY * graphView.scale;
+        applyGraphTransform();
+    }
+
+    function ensureLayout() {
+        if (!state.canvas || typeof state.canvas !== 'object') state.canvas = { nodes: {} };
+        if (!state.canvas.nodes || typeof state.canvas.nodes !== 'object') state.canvas.nodes = {};
+        state.canvas.nodes = Object.assign(Object.create(null), state.canvas.nodes);
+        state.steps.forEach((step, index) => {
+            const position = state.canvas.nodes[step.id];
+            if (!position || !Number.isFinite(position.x) || !Number.isFinite(position.y)) {
+                state.canvas.nodes[step.id] = index === 0 ? { x: 100, y: 140 } : { x: 380, y: 100 + (index - 1) * 220 };
+            }
+        });
+    }
+
+    function newStepId() {
+        let id;
+        do { id = 'step_' + Math.random().toString(36).slice(2, 8); }
+        while (id === 'reset' || state.steps.some(step => step.id === id));
+        return id;
+    }
+
+    function addStep() {
+        const id = newStepId();
+        const index = state.steps.length;
+        state.steps.push({ id, title: 'New Step', badge: '', alert_type: '', alert_text: '', script: '', note: '', buttons: [] });
+        state.canvas.nodes[id] = { x: 380, y: 100 + Math.max(0, index - 1) * 220 };
+        selectedStepId = id;
+        render();
+    }
+
+    function deleteStep(id) {
+        if (id === 'step_1') return;
+        const incoming = state.steps.flatMap(step => step.buttons.filter(button => button.target === id).map(button => step.id));
+        if (incoming.length) {
+            alert('This step has incoming connections from: ' + [...new Set(incoming)].join(', ') + '. Retarget or remove those buttons before deleting it.');
+            return;
+        }
+        if (!confirm('Delete step "' + id + '" and its response buttons?')) return;
+        state.steps = state.steps.filter(step => step.id !== id);
+        delete state.canvas.nodes[id];
+        selectedStepId = 'step_1';
+        render();
+    }
+
     function addItem(key) { state[key].push({ id: '', label: '', content: '' }); render(); }
-    function updateItem(key, idx, field, val) { state[key][idx][field] = val; render(); }
+    function updateItem(key, idx, field, value) { state[key][idx][field] = value; render(); }
     function deleteItem(key, idx) { state[key].splice(idx, 1); render(); }
-    
-    function addStepAt(idx) { 
-        state.steps.splice(idx, 0, { id: 'new_step_' + Date.now().toString().slice(-4), title: 'New Step', badge: '', alert_type: '', alert_text: '', script: '', note: '', buttons: [] }); 
-        stepToScroll = idx; render(); 
-    }
-    
-    function moveStepUp(idx) {
-        if (idx <= 1) return;
-        const temp = state.steps[idx - 1]; state.steps[idx - 1] = state.steps[idx]; state.steps[idx] = temp;
-        stepToScroll = idx - 1; render();
+
+    function validateConfig(config) {
+        if (!config || typeof config !== 'object' || Array.isArray(config)) throw new Error('Configuration must be a JSON object.');
+        for (const key of ['panicButtons', 'referenceLinks', 'steps']) {
+            if (!Array.isArray(config[key])) throw new Error('"' + key + '" must be an array.');
+        }
+        for (const key of ['panicButtons', 'referenceLinks']) {
+            config[key].forEach((item, index) => {
+                if (!item || typeof item !== 'object') throw new Error(key + ' item ' + (index + 1) + ' must be an object.');
+                for (const field of ['id', 'label', 'content']) {
+                    if (typeof item[field] !== 'string') throw new Error(key + ' item ' + (index + 1) + ' needs a string "' + field + '".');
+                }
+            });
+        }
+        if (!config.steps.length || !config.steps[0] || config.steps[0].id !== 'step_1') throw new Error('The first step must have ID "step_1".');
+        const ids = new Set();
+        config.steps.forEach((step, index) => {
+            if (!step || typeof step !== 'object' || typeof step.id !== 'string' || !step.id.trim()) throw new Error('Step ' + (index + 1) + ' needs a non-empty ID.');
+            if (step.id === 'reset') throw new Error('"reset" is reserved for the flow reset action.');
+            if (ids.has(step.id)) throw new Error('Duplicate step ID: "' + step.id + '".');
+            ids.add(step.id);
+            for (const field of ['title', 'badge', 'script']) if (typeof step[field] !== 'string') throw new Error('Step "' + step.id + '" needs a string "' + field + '".');
+            if (!Array.isArray(step.buttons)) throw new Error('Buttons for step "' + step.id + '" must be an array.');
+            if (step.alert_type && !['warning', 'stop'].includes(step.alert_type)) throw new Error('Unsupported alert type on step "' + step.id + '".');
+            step.buttons.forEach((button, buttonIndex) => {
+                if (!button || typeof button.label !== 'string' || typeof button.target !== 'string' || typeof button.style !== 'string') throw new Error('Button ' + (buttonIndex + 1) + ' on "' + step.id + '" needs string label, target, and style values.');
+            });
+        });
+        config.steps.forEach(step => step.buttons.forEach(button => {
+            if (button.target !== 'reset' && !ids.has(button.target)) throw new Error('Button "' + button.label + '" on "' + step.id + '" points to missing step "' + button.target + '".');
+        }));
+        if (config.canvas !== undefined && (!config.canvas || typeof config.canvas !== 'object' || Array.isArray(config.canvas))) throw new Error('"canvas" layout metadata must be an object.');
+        if (config.canvas && config.canvas.nodes !== undefined) {
+            if (!config.canvas.nodes || typeof config.canvas.nodes !== 'object' || Array.isArray(config.canvas.nodes)) throw new Error('"canvas.nodes" must be an object.');
+            Object.entries(config.canvas.nodes).forEach(([id, position]) => {
+                if (!position || typeof position !== 'object' || !Number.isFinite(position.x) || !Number.isFinite(position.y)) throw new Error('Canvas position for "' + id + '" needs numeric x and y values.');
+            });
+        }
     }
 
-    function moveStepDown(idx) {
-        if (idx === 0 || idx >= state.steps.length - 1) return;
-        const temp = state.steps[idx + 1]; state.steps[idx + 1] = state.steps[idx]; state.steps[idx] = temp;
-        stepToScroll = idx + 1; render();
-    }
-
-    function updateStep(idx, field, val) {
-        if(field === 'id' && val === 'reset') { alert('ID cannot be "reset"'); return; }
-        state.steps[idx][field] = val; render();
-    }
-    
-    function deleteStep(idx) { if(idx > 0 && confirm("Delete this step?")) { state.steps.splice(idx, 1); render(); } }
-    
-    function addBtnToStep(sIdx) { 
-        if (!state.steps[sIdx].buttons) state.steps[sIdx].buttons = [];
-        state.steps[sIdx].buttons.push({ label: 'New Button', target: 'reset', style: 'btn-primary' }); 
-        render(); 
-    }
-    
-    function moveBtnUp(sIdx, bIdx) {
-        if (bIdx === 0) return;
-        const temp = state.steps[sIdx].buttons[bIdx - 1]; state.steps[sIdx].buttons[bIdx - 1] = state.steps[sIdx].buttons[bIdx]; state.steps[sIdx].buttons[bIdx] = temp; render();
-    }
-
-    function moveBtnDown(sIdx, bIdx) {
-        if (bIdx >= state.steps[sIdx].buttons.length - 1) return;
-        const temp = state.steps[sIdx].buttons[bIdx + 1]; state.steps[sIdx].buttons[bIdx + 1] = state.steps[sIdx].buttons[bIdx]; state.steps[sIdx].buttons[bIdx] = temp; render();
-    }
-
-    function updateBtn(sIdx, bIdx, field, val) { state.steps[sIdx].buttons[bIdx][field] = val; render(); }
-    function removeBtn(sIdx, bIdx) { state.steps[sIdx].buttons.splice(bIdx, 1); render(); }
-
-    function copyJSON() {
-        navigator.clipboard.writeText(document.getElementById('json-output').innerText);
-        alert('JSON copied to clipboard!');
+    async function copyJSON() {
+        const text = document.getElementById('json-output').innerText;
+        try {
+            await navigator.clipboard.writeText(text);
+            alert('JSON copied to clipboard.');
+        } catch (error) {
+            window.prompt('Copy the configuration JSON:', text);
+        }
     }
 
     function importJSON() {
         try {
             const parsed = JSON.parse(document.getElementById('import-area').value);
-            if(!parsed.steps || parsed.steps[0].id !== 'step_1') throw new Error('First step must be step_1');
-            state = parsed; render(); alert('JSON loaded successfully!');
-        } catch(e) { alert('Invalid JSON: ' + e.message); }
+            validateConfig(parsed);
+            state = parsed;
+            ensureLayout();
+            selectedStepId = 'step_1';
+            connectingSource = null;
+            graphHasInitialFit = false;
+            graphView = { x: 30, y: 30, scale: 1 };
+            render();
+            alert('JSON loaded successfully.');
+        } catch (error) {
+            alert('Invalid configuration: ' + error.message);
+        }
     }
 
+    document.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && connectingSource) {
+            connectingSource = null;
+            renderFlow();
+        }
+    });
+    document.addEventListener('pointerup', endPointer);
+
+    document.getElementById('meta-updated').value = state.lastUpdated;
     render();
 </script>
 </body>
