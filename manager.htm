@@ -61,8 +61,9 @@
         #connection-status { font-weight: 700; color: var(--teal-dark); text-align: right; }
         #graph-viewport { position: relative; overflow: hidden; flex: 1; min-height: 390px; border: 1px solid #cbd5d1; background-color: #e8eeeb; background-image: radial-gradient(#bdcbc6 0.8px, transparent 0.8px); background-size: 20px 20px; cursor: grab; touch-action: none; }
         #graph-viewport.panning { cursor: grabbing; }
-        #graph-world { position: absolute; left: 0; top: 0; width: 5000px; height: 4000px; transform-origin: 0 0; }
-        #graph-edges { position: absolute; inset: 0; width: 5000px; height: 4000px; overflow: visible; pointer-events: none; }
+        #graph-world { position: absolute; left: 0; top: 0; width: 1100px; height: 700px; transform-origin: 0 0; border: 2px dashed #94a49e; }
+        #canvas-boundary-label { position: absolute; top: 10px; left: 12px; z-index: 0; color: #788984; font-size: 9px; font-weight: 800; letter-spacing: 1px; pointer-events: none; }
+        #graph-edges { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
         .graph-node { position: absolute; width: 254px; background: #fff; border: 1px solid #b9c9c4; border-radius: 5px; box-shadow: 0 5px 14px #233a351c; z-index: 1; }
         .graph-node.selected { border: 2px solid var(--teal); box-shadow: 0 0 0 3px #087e781d, 0 7px 16px #233a3524; }
         .node-header { padding: 9px 11px 7px; border-bottom: 1px solid #e4ebe8; cursor: grab; touch-action: none; }
@@ -82,7 +83,8 @@
         .port { flex: 0 0 15px; width: 15px; height: 15px; padding: 0; border: 2px solid var(--teal); border-radius: 50%; background: #fff; z-index: 2; }
         .port:hover, .port.connecting { background: #80cbb2; box-shadow: 0 0 0 4px #087e781f; }
         .node-input { position: absolute; width: 14px; height: 14px; left: -8px; top: 19px; }
-        .reset-node { position: absolute; width: 174px; min-height: 58px; top: 12px; right: 12px; display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid #d6a19a; border-radius: 5px; color: #762f28; background: #fff5f2; box-shadow: 0 5px 14px #233a351c; z-index: 5; cursor: default; }
+        .reset-node { position: absolute; width: 174px; min-height: 58px; display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid #d6a19a; border-radius: 5px; color: #762f28; background: #fff5f2; box-shadow: 0 5px 14px #233a351c; z-index: 1; cursor: grab; touch-action: none; }
+        .reset-node:active { cursor: grabbing; }
         .reset-node .node-input { top: 21px; border-color: var(--coral); }
         .reset-symbol { width: 30px; height: 30px; display: grid; place-items: center; border: 1px solid #e7b6ac; border-radius: 50%; font-size: 19px; }
         .reset-title { font-size: 12px; font-weight: 800; }
@@ -212,7 +214,7 @@
         panicButtons: [],
         referenceLinks: [],
         steps: [{ id: "step_1", title: "Greeting", badge: "Greeting", alert_type: "", alert_text: "", script: "", note: "", buttons: [] }],
-        canvas: { nodes: { step_1: { x: 100, y: 140 } } }
+        canvas: { nodes: { step_1: { x: 100, y: 140 } }, reset: { x: 760, y: 145 } }
     };
     let selectedStepId = 'step_1';
     let connectingSource = null;
@@ -282,10 +284,14 @@
         const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         svg.setAttribute('id', 'graph-edges');
         world.appendChild(svg);
+        const boundaryLabel = document.createElement('div');
+        boundaryLabel.id = 'canvas-boundary-label';
+        boundaryLabel.textContent = 'WORK AREA · EXPANDS AS YOU BUILD';
+        world.appendChild(boundaryLabel);
 
         state.steps.forEach((step, stepIndex) => world.appendChild(createStepNode(step, stepIndex)));
+        world.appendChild(createResetNode());
         viewport.replaceChildren(world);
-        viewport.appendChild(createResetNode());
         viewport.onpointerdown = startPan;
         viewport.onwheel = zoomAtPointer;
         viewport.onpointermove = movePointer;
@@ -383,6 +389,10 @@
     function createResetNode() {
         const reset = document.createElement('div');
         reset.className = 'reset-node';
+        reset.dataset.stepId = 'reset';
+        reset.style.left = state.canvas.reset.x + 'px';
+        reset.style.top = state.canvas.reset.y + 'px';
+        reset.addEventListener('pointerdown', event => startNodeDrag(event, 'reset'));
         const input = document.createElement('button');
         input.className = 'port node-input';
         input.title = 'Connect to flow reset';
@@ -423,9 +433,15 @@
         svg.appendChild(defs);
 
         const graphWorld = svg.parentElement;
-        const graphPositions = state.steps.map(step => state.canvas.nodes[step.id]);
-        const graphWidth = Math.max(5000, ...graphPositions.map(position => position.x + 1500));
-        const graphHeight = Math.max(4000, ...state.steps.map(step => state.canvas.nodes[step.id].y + 140 + step.buttons.length * 34));
+        const graphPositions = state.steps.map(step => ({
+            x: state.canvas.nodes[step.id].x,
+            y: state.canvas.nodes[step.id].y,
+            width: 254,
+            height: 140 + step.buttons.length * 34
+        }));
+        graphPositions.push({ x: state.canvas.reset.x, y: state.canvas.reset.y, width: 174, height: 58 });
+        const graphWidth = Math.max(1100, ...graphPositions.map(position => position.x + position.width + 180));
+        const graphHeight = Math.max(700, ...graphPositions.map(position => position.y + position.height + 160));
         graphWorld.style.width = graphWidth + 'px';
         graphWorld.style.height = graphHeight + 'px';
         svg.setAttribute('width', graphWidth);
@@ -434,17 +450,16 @@
 
         state.steps.forEach(step => step.buttons.forEach((button, buttonIndex) => {
             const source = state.canvas.nodes[step.id];
-            const target = button.target === 'reset' ? getResetGraphPoint() : state.canvas.nodes[button.target];
+            const target = button.target === 'reset' ? state.canvas.reset : state.canvas.nodes[button.target];
             if (!source || !target) return;
-            const startX = source.x + 254;
-            const startY = source.y + 121 + buttonIndex * 34;
-            const endX = target.x;
-            const endY = button.target === 'reset' ? target.y + 28 : target.y + 26;
-            const curve = Math.max(70, Math.abs(endX - startX) * 0.45);
+            const start = getPortPosition(step.id, buttonIndex, 'output');
+            const end = getPortPosition(button.target, 0, 'input');
+            const sourceId = step.id;
+            const targetId = button.target;
             const path = document.createElementNS(svg.namespaceURI, 'path');
             const pathId = 'edge-' + stepIndexSafe(step.id) + '-' + buttonIndex;
             path.setAttribute('id', pathId);
-            path.setAttribute('d', `M ${startX} ${startY} C ${startX + curve} ${startY}, ${endX - curve} ${endY}, ${endX} ${endY}`);
+            path.setAttribute('d', routeEdge(start.x, start.y, end.x, end.y, sourceId, targetId));
             path.setAttribute('fill', 'none');
             path.setAttribute('stroke', edgeColor(button.style));
             path.setAttribute('stroke-width', '2.5');
@@ -488,11 +503,109 @@
         return '#087e78';
     }
 
-    function getResetGraphPoint() {
-        const viewport = document.getElementById('graph-viewport');
-        const localX = viewport.clientWidth - 12 - 174;
-        const localY = 12 + 29;
-        return { x: (localX - graphView.x) / graphView.scale, y: (localY - graphView.y) / graphView.scale };
+    function getNodeBounds(id) {
+        const node = [...document.querySelectorAll('.graph-node, .reset-node')].find(item => item.dataset.stepId === id);
+        if (!node) return null;
+        const position = id === 'reset' ? state.canvas.reset : state.canvas.nodes[id];
+        return { id, left: position.x, top: position.y, right: position.x + node.offsetWidth, bottom: position.y + node.offsetHeight };
+    }
+
+    function getPortPosition(stepId, buttonIndex, direction) {
+        const node = [...document.querySelectorAll('.graph-node, .reset-node')].find(item => item.dataset.stepId === stepId);
+        const port = direction === 'output'
+            ? node.querySelectorAll('.output-row .port')[buttonIndex]
+            : node.querySelector('.node-input');
+        const portBounds = port.getBoundingClientRect();
+        const viewportBounds = document.getElementById('graph-viewport').getBoundingClientRect();
+        return {
+            x: (portBounds.left + portBounds.width / 2 - viewportBounds.left - graphView.x) / graphView.scale,
+            y: (portBounds.top + portBounds.height / 2 - viewportBounds.top - graphView.y) / graphView.scale
+        };
+    }
+
+    function routeEdge(startX, startY, endX, endY, sourceId, targetId) {
+        const margin = 16;
+        const obstacles = [...state.steps.map(step => getNodeBounds(step.id)), getNodeBounds('reset')]
+            .filter(bounds => bounds && bounds.id !== sourceId && bounds.id !== targetId)
+            .map(bounds => ({ left: bounds.left - margin, right: bounds.right + margin, top: bounds.top - margin, bottom: bounds.bottom + margin }));
+        const lanes = new Set([startY, endY]);
+        obstacles.forEach(bounds => { lanes.add(bounds.top - 14); lanes.add(bounds.bottom + 14); });
+        if (obstacles.length) {
+            lanes.add(Math.min(...obstacles.map(bounds => bounds.top)) - 30);
+            lanes.add(Math.max(...obstacles.map(bounds => bounds.bottom)) + 30);
+        }
+
+        let bestPoints = null;
+        let bestScore = Infinity;
+        for (const laneY of lanes) {
+            for (const escapeX of [startX + 24, startX + 48]) {
+                for (const approachX of [endX - 24, endX - 48]) {
+                    const points = simplifyRoute([
+                        { x: startX, y: startY },
+                        { x: escapeX, y: startY },
+                        { x: escapeX, y: laneY },
+                        { x: approachX, y: laneY },
+                        { x: approachX, y: endY },
+                        { x: endX, y: endY }
+                    ]);
+                    if (routeHitsObstacle(points, obstacles)) continue;
+                    const length = points.slice(1).reduce((sum, point, index) => sum + Math.abs(point.x - points[index].x) + Math.abs(point.y - points[index].y), 0);
+                    const score = length + (points.length - 2) * 18;
+                    if (score < bestScore) { bestPoints = points; bestScore = score; }
+                }
+            }
+        }
+
+        if (!bestPoints) bestPoints = simplifyRoute([
+            { x: startX, y: startY },
+            { x: startX + 48, y: startY },
+            { x: startX + 48, y: Math.min(startY, endY) - 40 },
+            { x: endX - 48, y: Math.min(startY, endY) - 40 },
+            { x: endX - 48, y: endY },
+            { x: endX, y: endY }
+        ]);
+        return roundedRoutePath(bestPoints);
+    }
+
+    function simplifyRoute(points) {
+        const result = points.filter((point, index) => index === 0 || point.x !== points[index - 1].x || point.y !== points[index - 1].y);
+        for (let index = result.length - 2; index > 0; index--) {
+            const previous = result[index - 1];
+            const current = result[index];
+            const next = result[index + 1];
+            if ((previous.x === current.x && current.x === next.x) || (previous.y === current.y && current.y === next.y)) result.splice(index, 1);
+        }
+        return result;
+    }
+
+    function routeHitsObstacle(points, obstacles) {
+        for (let index = 1; index < points.length; index++) {
+            const start = points[index - 1];
+            const end = points[index];
+            for (const bounds of obstacles) {
+                if (start.y === end.y && start.y > bounds.top && start.y < bounds.bottom && Math.max(start.x, end.x) > bounds.left && Math.min(start.x, end.x) < bounds.right) return true;
+                if (start.x === end.x && start.x > bounds.left && start.x < bounds.right && Math.max(start.y, end.y) > bounds.top && Math.min(start.y, end.y) < bounds.bottom) return true;
+            }
+        }
+        return false;
+    }
+
+    function roundedRoutePath(points) {
+        if (points.length < 2) return '';
+        let path = `M ${points[0].x} ${points[0].y}`;
+        for (let index = 1; index < points.length - 1; index++) {
+            const previous = points[index - 1];
+            const current = points[index];
+            const next = points[index + 1];
+            const beforeLength = Math.hypot(previous.x - current.x, previous.y - current.y);
+            const afterLength = Math.hypot(next.x - current.x, next.y - current.y);
+            const radius = Math.min(10, beforeLength / 2, afterLength / 2);
+            const before = { x: current.x + (previous.x - current.x) / beforeLength * radius, y: current.y + (previous.y - current.y) / beforeLength * radius };
+            const after = { x: current.x + (next.x - current.x) / afterLength * radius, y: current.y + (next.y - current.y) / afterLength * radius };
+            path += ` L ${before.x} ${before.y} Q ${current.x} ${current.y} ${after.x} ${after.y}`;
+        }
+        const end = points[points.length - 1];
+        return path + ` L ${end.x} ${end.y}`;
     }
 
     function renderInspector() {
@@ -582,10 +695,13 @@
         event.preventDefault();
         event.stopPropagation();
         selectedStepId = stepId;
-        const position = state.canvas.nodes[stepId];
+        if (stepId !== 'reset') {
+            selectedStepId = stepId;
+            renderInspector();
+            document.querySelectorAll('.graph-node').forEach(node => node.classList.toggle('selected', node.dataset.stepId === stepId));
+        }
+        const position = stepId === 'reset' ? state.canvas.reset : state.canvas.nodes[stepId];
         dragState = { stepId, startX: event.clientX, startY: event.clientY, nodeX: position.x, nodeY: position.y };
-        renderInspector();
-        document.querySelectorAll('.graph-node').forEach(node => node.classList.toggle('selected', node.dataset.stepId === stepId));
     }
 
     function startPan(event) {
@@ -597,10 +713,10 @@
 
     function movePointer(event) {
         if (dragState) {
-            const position = state.canvas.nodes[dragState.stepId];
+            const position = dragState.stepId === 'reset' ? state.canvas.reset : state.canvas.nodes[dragState.stepId];
             position.x = Math.max(10, dragState.nodeX + (event.clientX - dragState.startX) / graphView.scale);
             position.y = Math.max(10, dragState.nodeY + (event.clientY - dragState.startY) / graphView.scale);
-            const node = [...document.querySelectorAll('.graph-node')].find(item => item.dataset.stepId === dragState.stepId);
+            const node = [...document.querySelectorAll('.graph-node, .reset-node')].find(item => item.dataset.stepId === dragState.stepId);
             if (node) { node.style.left = position.x + 'px'; node.style.top = position.y + 'px'; }
             drawEdges();
         } else if (panState) {
@@ -660,11 +776,11 @@
             x: state.canvas.nodes[step.id].x,
             y: state.canvas.nodes[step.id].y,
             height: 140 + step.buttons.length * 34
-        }));
-        const minX = Math.min(...positions.map(position => position.x));
-        const minY = Math.min(...positions.map(position => position.y));
-        const maxX = Math.max(...positions.map(position => position.x + 254));
-        const maxY = Math.max(...positions.map(position => position.y + position.height));
+        })).concat([{ x: state.canvas.reset.x, y: state.canvas.reset.y, height: 58 }]);
+        const minX = 0;
+        const minY = 0;
+        const maxX = Math.max(1100, ...positions.map(position => position.x + 254 + 180));
+        const maxY = Math.max(700, ...positions.map(position => position.y + position.height + 160));
         const bounds = viewport.getBoundingClientRect();
         graphView.scale = Math.min(1.15, Math.max(0.08, Math.min((bounds.width - 80) / (maxX - minX), (bounds.height - 80) / (maxY - minY))));
         graphView.x = (bounds.width - (maxX - minX) * graphView.scale) / 2 - minX * graphView.scale;
@@ -686,11 +802,9 @@
                 }
             });
         }
-
-        const lastDepth = Math.max(...depth.values());
-        state.steps.forEach(step => {
+                const start = getPortPosition(connectingSource.stepId, connectingSource.buttonIndex, 'output');
             if (!depth.has(step.id)) depth.set(step.id, lastDepth + 1);
-        });
+                preview.setAttribute('d', `M ${start.x} ${start.y} L ${connectingSource.pointer.x} ${connectingSource.pointer.y}`);
         const levels = [...new Set(depth.values())].sort((a, b) => a - b);
         let column = 0;
         levels.forEach(level => {
@@ -704,6 +818,12 @@
                 column++;
             }
         });
+        const resetSources = state.steps.filter(step => step.buttons.some(button => button.target === 'reset'));
+        const resetX = 100 + column * 340;
+        const resetY = resetSources.length
+            ? resetSources.reduce((sum, step) => sum + state.canvas.nodes[step.id].y, 0) / resetSources.length
+            : 90;
+        state.canvas.reset = { x: resetX, y: resetY };
         render();
         fitGraph();
     }
@@ -712,6 +832,7 @@
         if (!state.canvas || typeof state.canvas !== 'object') state.canvas = { nodes: {} };
         if (!state.canvas.nodes || typeof state.canvas.nodes !== 'object') state.canvas.nodes = {};
         state.canvas.nodes = Object.assign(Object.create(null), state.canvas.nodes);
+        if (!state.canvas.reset || !Number.isFinite(state.canvas.reset.x) || !Number.isFinite(state.canvas.reset.y)) state.canvas.reset = { x: 760, y: 145 };
         state.steps.forEach((step, index) => {
             const position = state.canvas.nodes[step.id];
             if (!position || !Number.isFinite(position.x) || !Number.isFinite(position.y)) {
@@ -790,6 +911,10 @@
             Object.entries(config.canvas.nodes).forEach(([id, position]) => {
                 if (!position || typeof position !== 'object' || !Number.isFinite(position.x) || !Number.isFinite(position.y)) throw new Error('Canvas position for "' + id + '" needs numeric x and y values.');
             });
+        }
+        if (config.canvas && config.canvas.reset !== undefined) {
+            const position = config.canvas.reset;
+            if (!position || typeof position !== 'object' || !Number.isFinite(position.x) || !Number.isFinite(position.y)) throw new Error('Canvas reset position needs numeric x and y values.');
         }
     }
 
