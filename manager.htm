@@ -82,7 +82,7 @@
         .port { flex: 0 0 15px; width: 15px; height: 15px; padding: 0; border: 2px solid var(--teal); border-radius: 50%; background: #fff; z-index: 2; }
         .port:hover, .port.connecting { background: #80cbb2; box-shadow: 0 0 0 4px #087e781f; }
         .node-input { position: absolute; width: 14px; height: 14px; left: -8px; top: 19px; }
-        .reset-node { position: absolute; width: 174px; min-height: 58px; display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid #d6a19a; border-radius: 5px; color: #762f28; background: #fff5f2; box-shadow: 0 5px 14px #233a351c; z-index: 1; cursor: default; }
+        .reset-node { position: absolute; width: 174px; min-height: 58px; top: 12px; right: 12px; display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid #d6a19a; border-radius: 5px; color: #762f28; background: #fff5f2; box-shadow: 0 5px 14px #233a351c; z-index: 5; cursor: default; }
         .reset-node .node-input { top: 21px; border-color: var(--coral); }
         .reset-symbol { width: 30px; height: 30px; display: grid; place-items: center; border: 1px solid #e7b6ac; border-radius: 50%; font-size: 19px; }
         .reset-title { font-size: 12px; font-weight: 800; }
@@ -181,6 +181,7 @@
             <div><p class="eyebrow">Flow designer</p><h2>Conversation map</h2><p class="section-subtitle">Arrange steps, then connect each response to its next destination.</p></div>
             <div class="flow-tools">
                 <button class="action btn-add" onclick="addStep()">+ Add Step</button>
+                <button class="action btn-muted" onclick="autoArrange()">Auto arrange</button>
                 <button class="tool-btn" title="Zoom out" aria-label="Zoom out" onclick="zoomGraph(0.85)">−</button>
                 <button class="tool-btn" title="Zoom in" aria-label="Zoom in" onclick="zoomGraph(1.18)">+</button>
                 <button class="tool-btn" title="Fit graph" aria-label="Fit graph" onclick="fitGraph()">⌗</button>
@@ -280,12 +281,11 @@
         world.id = 'graph-world';
         const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         svg.setAttribute('id', 'graph-edges');
-        svg.setAttribute('viewBox', '0 0 5000 4000');
         world.appendChild(svg);
 
         state.steps.forEach((step, stepIndex) => world.appendChild(createStepNode(step, stepIndex)));
-        world.appendChild(createResetNode());
         viewport.replaceChildren(world);
+        viewport.appendChild(createResetNode());
         viewport.onpointerdown = startPan;
         viewport.onwheel = zoomAtPointer;
         viewport.onpointermove = movePointer;
@@ -383,8 +383,6 @@
     function createResetNode() {
         const reset = document.createElement('div');
         reset.className = 'reset-node';
-        reset.style.left = '760px';
-        reset.style.top = '145px';
         const input = document.createElement('button');
         input.className = 'port node-input';
         input.title = 'Connect to flow reset';
@@ -424,9 +422,19 @@
         defs.appendChild(marker);
         svg.appendChild(defs);
 
+        const graphWorld = svg.parentElement;
+        const graphPositions = state.steps.map(step => state.canvas.nodes[step.id]);
+        const graphWidth = Math.max(5000, ...graphPositions.map(position => position.x + 1500));
+        const graphHeight = Math.max(4000, ...state.steps.map(step => state.canvas.nodes[step.id].y + 140 + step.buttons.length * 34));
+        graphWorld.style.width = graphWidth + 'px';
+        graphWorld.style.height = graphHeight + 'px';
+        svg.setAttribute('width', graphWidth);
+        svg.setAttribute('height', graphHeight);
+        svg.setAttribute('viewBox', `0 0 ${graphWidth} ${graphHeight}`);
+
         state.steps.forEach(step => step.buttons.forEach((button, buttonIndex) => {
             const source = state.canvas.nodes[step.id];
-            const target = button.target === 'reset' ? { x: 760, y: 145 } : state.canvas.nodes[button.target];
+            const target = button.target === 'reset' ? getResetGraphPoint() : state.canvas.nodes[button.target];
             if (!source || !target) return;
             const startX = source.x + 254;
             const startY = source.y + 121 + buttonIndex * 34;
@@ -478,6 +486,13 @@
         if (style === 'btn-warning') return '#ca8b21';
         if (style === 'btn-secondary') return '#71817d';
         return '#087e78';
+    }
+
+    function getResetGraphPoint() {
+        const viewport = document.getElementById('graph-viewport');
+        const localX = viewport.clientWidth - 12 - 174;
+        const localY = 12 + 29;
+        return { x: (localX - graphView.x) / graphView.scale, y: (localY - graphView.y) / graphView.scale };
     }
 
     function renderInspector() {
@@ -592,6 +607,7 @@
             graphView.x = panState.viewX + event.clientX - panState.startX;
             graphView.y = panState.viewY + event.clientY - panState.startY;
             applyGraphTransform();
+            drawEdges();
         } else if (connectingSource) {
             const viewport = document.getElementById('graph-viewport');
             const bounds = viewport.getBoundingClientRect();
@@ -630,25 +646,66 @@
         const localY = clientY - bounds.top;
         const graphX = (localX - graphView.x) / graphView.scale;
         const graphY = (localY - graphView.y) / graphView.scale;
-        graphView.scale = Math.min(1.8, Math.max(0.45, graphView.scale * factor));
+        graphView.scale = Math.min(1.8, Math.max(0.08, graphView.scale * factor));
         graphView.x = localX - graphX * graphView.scale;
         graphView.y = localY - graphY * graphView.scale;
         applyGraphTransform();
+        drawEdges();
     }
 
     function fitGraph() {
         const viewport = document.getElementById('graph-viewport');
         if (!viewport) return;
-        const positions = state.steps.map(step => state.canvas.nodes[step.id]).concat([{ x: 760, y: 145 }]);
+        const positions = state.steps.map(step => ({
+            x: state.canvas.nodes[step.id].x,
+            y: state.canvas.nodes[step.id].y,
+            height: 140 + step.buttons.length * 34
+        }));
         const minX = Math.min(...positions.map(position => position.x));
         const minY = Math.min(...positions.map(position => position.y));
         const maxX = Math.max(...positions.map(position => position.x + 254));
-        const maxY = Math.max(...positions.map(position => position.y + 180));
+        const maxY = Math.max(...positions.map(position => position.y + position.height));
         const bounds = viewport.getBoundingClientRect();
-        graphView.scale = Math.min(1.15, Math.max(0.45, Math.min((bounds.width - 80) / (maxX - minX), (bounds.height - 80) / (maxY - minY))));
+        graphView.scale = Math.min(1.15, Math.max(0.08, Math.min((bounds.width - 80) / (maxX - minX), (bounds.height - 80) / (maxY - minY))));
         graphView.x = (bounds.width - (maxX - minX) * graphView.scale) / 2 - minX * graphView.scale;
         graphView.y = (bounds.height - (maxY - minY) * graphView.scale) / 2 - minY * graphView.scale;
         applyGraphTransform();
+        drawEdges();
+    }
+
+    function autoArrange() {
+        const stepById = new Map(state.steps.map(step => [step.id, step]));
+        const depth = new Map([['step_1', 0]]);
+        const queue = ['step_1'];
+        for (let cursor = 0; cursor < queue.length; cursor++) {
+            const step = stepById.get(queue[cursor]);
+            step.buttons.forEach(button => {
+                if (button.target !== 'reset' && stepById.has(button.target) && !depth.has(button.target)) {
+                    depth.set(button.target, depth.get(step.id) + 1);
+                    queue.push(button.target);
+                }
+            });
+        }
+
+        const lastDepth = Math.max(...depth.values());
+        state.steps.forEach(step => {
+            if (!depth.has(step.id)) depth.set(step.id, lastDepth + 1);
+        });
+        const levels = [...new Set(depth.values())].sort((a, b) => a - b);
+        let column = 0;
+        levels.forEach(level => {
+            const stepsAtLevel = state.steps.filter(step => depth.get(step.id) === level);
+            for (let offset = 0; offset < stepsAtLevel.length; offset += 7) {
+                let rowY = 90;
+                stepsAtLevel.slice(offset, offset + 7).forEach(step => {
+                    state.canvas.nodes[step.id] = { x: 100 + column * 340, y: rowY };
+                    rowY += Math.max(220, 160 + step.buttons.length * 34);
+                });
+                column++;
+            }
+        });
+        render();
+        fitGraph();
     }
 
     function ensureLayout() {
