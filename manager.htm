@@ -478,11 +478,9 @@
             }
         }));
         if (connectingSource && connectingSource.pointer) {
-            const source = state.canvas.nodes[connectingSource.stepId];
-            const startX = source.x + 254;
-            const startY = source.y + 121 + connectingSource.buttonIndex * 34;
+            const start = getPortPosition(connectingSource.stepId, connectingSource.buttonIndex, 'output');
             const preview = document.createElementNS(svg.namespaceURI, 'path');
-            preview.setAttribute('d', `M ${startX} ${startY} C ${startX + 80} ${startY}, ${connectingSource.pointer.x - 80} ${connectingSource.pointer.y}, ${connectingSource.pointer.x} ${connectingSource.pointer.y}`);
+            preview.setAttribute('d', routeEdge(start.x, start.y, connectingSource.pointer.x, connectingSource.pointer.y, connectingSource.stepId, '__cursor__'));
             preview.setAttribute('fill', 'none');
             preview.setAttribute('stroke', '#087e78');
             preview.setAttribute('stroke-width', '2');
@@ -802,9 +800,10 @@
                 }
             });
         }
-                const start = getPortPosition(connectingSource.stepId, connectingSource.buttonIndex, 'output');
+        const lastDepth = Math.max(...depth.values());
+        state.steps.forEach(step => {
             if (!depth.has(step.id)) depth.set(step.id, lastDepth + 1);
-                preview.setAttribute('d', `M ${start.x} ${start.y} L ${connectingSource.pointer.x} ${connectingSource.pointer.y}`);
+        });
         const levels = [...new Set(depth.values())].sort((a, b) => a - b);
         let column = 0;
         levels.forEach(level => {
