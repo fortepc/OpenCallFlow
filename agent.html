@@ -6,72 +6,98 @@
     <title>OpenCallFlow Assistant</title>
     <style>
         :root {
-            --brand-color: #0056b3;
-            --brand-hover: #004494;
-            --gray-text: #6A6A6A;
-            --dark-bg: #1a1a1a;
-            --light-bg: #F5F5F7;
-            --card-bg: #FFFFFF;
-            --text-color: #333333;
-            --border-color: #E0E0E0;
-            --success-color: #2E7D32;
-            --alert-color: #C62828;
-            --warning-color: #856404;
-            --warning-bg: #FFF3CD;
+          --a-brand:#0056b3; --a-brand-hover:#004494; --a-primary-button-bg:#0056b3; --a-primary-button-text:#ffffff; --a-sidebar:#1a1a1a; --a-sidebar-text:#ffffff;
+          --a-page:#f5f5f7; --a-panel:#ffffff; --a-text:#333333; --a-muted:#6a6a6a; --a-border:#e0e0e0;
+          --a-subtle-surface:#f0f0f0; --a-subtle-text:#555555; --a-input-bg:#ffffff; --a-input-text:#333333;
+          --a-input-border:#cccccc; --a-input-focus:#0056b3; --a-secondary:#e0e0e0; --a-secondary-text:#333333;
+          --a-outline-border:#0056b3; --a-script-bg:#f4f8fc; --a-script-border:#0056b3; --a-badge-bg:#e0e0e0;
+          --a-badge-text:#555555; --a-success:#2e7d32; --a-success-text:#ffffff; --a-danger:#c62828;
+          --a-danger-text:#ffffff; --a-warning-bg:#fff3cd; --a-warning-text:#856404; --a-warning-border:#ffebaa;
+          --a-danger-bg:#f8d7da; --a-danger-border:#f5c6cb; --a-info-bg:#d1ecf1; --a-info-text:#0c5460;
+          --a-info-border:#bee5eb; --a-success-bg:#d4edda; --a-success-border:#c3e6cb;
+          --a-overlay:#000000; --a-shadow:#0056b3;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-        body { background-color: var(--light-bg); color: var(--text-color); display: flex; height: 100vh; overflow: hidden; }
+        body { background-color: var(--a-page); color: var(--a-text); display: flex; height: 100vh; overflow: hidden; }
         #app-container { display: flex; width: 100%; height: 100%; }
 
-        #sidebar { width: 320px; background-color: var(--dark-bg); color: white; padding: 20px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; border-right: 4px solid var(--brand-color); }
-        #sidebar h2 { font-size: 0.9rem; color: var(--brand-color); margin-top: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        #sidebar { width: 320px; background-color: var(--a-sidebar); color: var(--a-sidebar-text); padding: 20px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; border-right: 4px solid var(--a-brand); }
+        #sidebar h2 { font-size: 0.9rem; color: var(--a-brand); margin-top: 10px; text-transform: uppercase; letter-spacing: 1px; }
 
-        #ref-search { width: 100%; padding: 8px 12px; border-radius: 4px; border: 1px solid #444; background: #222; color: white; margin-bottom: 5px; }
-        #ref-search::placeholder { color: #888; }
+        #panic-search { width: 100%; padding: 8px 12px; border-radius: 4px; border: 1px solid var(--a-input-border); background: var(--a-input-bg); color: var(--a-input-text); margin-bottom: 5px; }
+        #panic-search::placeholder { color: var(--a-muted); }
 
-        .objection-btn { background: #222; color: #DDD; border: 1px solid #444; padding: 10px 12px; border-radius: 6px; cursor: pointer; text-align: left; font-size: 0.9rem; transition: all 0.2s ease; }
-        .objection-btn:hover { background: var(--brand-color); color: white; border-color: var(--brand-color); }
+        .sidebar-item-list { display: flex; flex-direction: column; gap: 10px; }
+        .objection-btn { background: color-mix(in srgb, var(--a-sidebar-text) 8%, var(--a-sidebar)); color: var(--a-sidebar-text); border: 1px solid var(--a-border); padding: 10px 12px; border-radius: 6px; cursor: pointer; text-align: left; font-size: 0.9rem; transition: all 0.2s ease; }
+        .objection-btn:hover { background: var(--a-primary-button-bg); color: var(--a-primary-button-text); border-color: var(--a-primary-button-bg); }
 
-        #sidebar-footer { margin-top: auto; padding-top: 20px; border-top: 1px solid #333; display: flex; flex-direction: column; gap: 10px; }
-        .hotfix-btn { background: transparent; color: #aaa; border: 1px solid #444; padding: 8px 10px; font-size: 0.75rem; cursor: pointer; border-radius: 4px; width: 100%; }
-        .hotfix-btn:hover { background: #333; }
+        #sidebar-footer { margin-top: auto; padding-top: 20px; border-top: 1px solid var(--a-border); display: flex; flex-direction: column; gap: 10px; }
+        .hotfix-btn { background: transparent; color: var(--a-muted); border: 1px solid var(--a-border); padding: 8px 10px; font-size: 0.75rem; cursor: pointer; border-radius: 4px; width: 100%; }
+        .hotfix-btn:hover { background: var(--a-subtle-surface); color: var(--a-text); }
 
-        .floating-reset { position: fixed; bottom: 30px; right: 30px; background: var(--brand-color); color: white; border: none; padding: 15px 25px; border-radius: 30px; box-shadow: 0 4px 15px rgba(0, 86, 179, 0.4); cursor: pointer; font-weight: bold; z-index: 999; }
-        .floating-reset:hover { background: var(--brand-hover); }
+        .floating-reset { position: fixed; bottom: 30px; right: 30px; background: var(--a-primary-button-bg); color: var(--a-primary-button-text); border: none; padding: 15px 25px; border-radius: 30px; box-shadow: 0 4px 15px color-mix(in srgb, var(--a-shadow) 40%, transparent); cursor: pointer; font-weight: bold; z-index: 999; }
+        .floating-reset:hover { filter: brightness(0.9); }
 
-        #main-content { flex: 1; display: flex; flex-direction: column; height: 100%; background-color: var(--light-bg); }
-        header { background-color: white; padding: 15px 30px; border-bottom: 1px solid var(--border-color); }
-        .logo-text { font-size: 1.2rem; font-weight: 800; color: var(--brand-color); }
+        #main-content { flex: 1; display: flex; flex-direction: column; height: 100%; background-color: var(--a-page); }
+        header { background-color: var(--a-panel); padding: 15px 30px; border-bottom: 1px solid var(--a-border); }
+        .header-brand { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+        .logo-text { font-size: 1.2rem; font-weight: 800; color: var(--a-brand); }
+        .theme-toggle { background: var(--a-panel); color: var(--a-text); border: 1px solid var(--a-border); border-radius: 4px; padding: 8px 12px; cursor: pointer; }
+        .theme-toggle:hover { border-color: var(--a-brand); }
 
         .flow-container { flex: 1; padding: 20px 40px 100px 40px; overflow-y: auto; display: flex; flex-direction: column; gap: 25px; align-items: center; }
-        .phase-card { background-color: var(--card-bg); border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); width: 100%; max-width: 800px; padding: 30px; border-left: 4px solid #E0E0E0; transition: border-color 0.3s ease; }
-        .phase-card.active-focus { border-left-color: var(--brand-color); box-shadow: 0 4px 25px rgba(0, 86, 179, 0.15); }
+        .phase-card { background-color: var(--a-panel); border-radius: 8px; box-shadow: 0 4px 15px color-mix(in srgb, var(--a-shadow) 6%, transparent); width: 100%; max-width: 800px; padding: 30px; border-left: 4px solid var(--a-border); transition: border-color 0.3s ease; }
+        .phase-card.active-focus { border-left-color: var(--a-brand); box-shadow: 0 4px 25px color-mix(in srgb, var(--a-shadow) 18%, transparent); }
 
-        h1 { font-size: 1.4rem; margin-bottom: 15px; color: #111; display: flex; justify-content: space-between; align-items: center; }
-        .step-badge { font-size: 0.8rem; background: #E0E0E0; padding: 4px 10px; border-radius: 12px; color: var(--gray-text); }
-        .script-box { background-color: #f4f8fc; border-left: 4px solid var(--brand-color); padding: 15px 20px; border-radius: 0 8px 8px 0; margin-bottom: 20px; font-size: 1.05rem; line-height: 1.6; }
-/*         .notes-box { font-size: 0.85rem; color: var(--gray-text); font-style: italic; margin-top: 15px; padding: 10px; background: #f9f9f9; border-radius: 4px; } */
+        h1 { font-size: 1.4rem; margin-bottom: 15px; color: var(--a-text); display: flex; justify-content: space-between; align-items: center; }
+        .step-badge { font-size: 0.8rem; background: var(--a-badge-bg); padding: 4px 10px; border-radius: 12px; color: var(--a-badge-text); }
+        .script-box { background-color: var(--a-script-bg); border-left: 4px solid var(--a-script-border); padding: 15px 20px; border-radius: 0 8px 8px 0; margin-bottom: 20px; font-size: 1.05rem; line-height: 1.6; }
+        .notes-box { font-size: 0.85rem; color: var(--a-muted); font-style: italic; margin-top: 15px; padding: 10px; background: var(--a-subtle-surface); border-radius: 4px; }
 
-        .alert-banner { padding: 12px 15px; border-radius: 6px; margin-bottom: 20px; font-size: 0.95rem; }
-        .alert-banner.warning { background-color: var(--warning-bg); border: 1px solid #FFEBAA; color: var(--warning-color); }
-        .alert-banner.stop { background-color: #F8D7DA; border-color: #F5C6CB; color: #721C24; }
+        .alert-banner { padding: 12px 15px; border-radius: 6px; margin-bottom: 20px; font-size: 0.95rem; border: 1px solid transparent; }
+        .alert-banner.warning { background-color: var(--a-warning-bg); border-color: var(--a-warning-border); color: var(--a-warning-text); }
+        .alert-banner.stop { background-color: var(--a-danger-bg); border-color: var(--a-danger-border); color: var(--a-danger-text); }
+        .alert-banner.info { background-color: var(--a-info-bg); border-color: var(--a-info-border); color: var(--a-info-text); }
+        .alert-banner.success { background-color: var(--a-success-bg); border-color: var(--a-success-border); color: var(--a-success-text); }
 
         .btn-container { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
         .btn { padding: 10px 20px; border: none; border-radius: 6px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-        .btn-primary { background-color: var(--brand-color); color: white; }
-        .btn-secondary { background-color: #E0E0E0; color: var(--text-color); }
-        .btn-success { background-color: var(--success-color); color: white; }
-        .btn-danger { background-color: var(--alert-color); color: white; }
+        .btn-primary { background-color: var(--a-primary-button-bg); color: var(--a-primary-button-text); }
+        .btn-secondary { background-color: var(--a-secondary); color: var(--a-secondary-text); }
+        .btn-success { background-color: var(--a-success); color: var(--a-success-text); }
+        .btn-danger { background-color: var(--a-danger); color: var(--a-danger-text); }
+        .btn-warning { background-color: var(--a-warning-bg); color: var(--a-warning-text); border: 1px solid var(--a-warning-border); }
+        .btn-outline { background: transparent; color: var(--a-brand); border: 1px solid var(--a-outline-border); }
         .btn-muted { opacity: 0.4; filter: grayscale(50%); }
-        .btn-selected { box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.2); transform: scale(0.98); }
+        .btn-selected { box-shadow: 0 0 0 3px color-mix(in srgb, var(--a-shadow) 20%, transparent); transform: scale(0.98); }
 
-        #modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
-        .modal-content { background: white; padding: 25px; border-radius: 8px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; color: var(--text-color); }
+        .config-import-label { display: block; text-align: center; }
+        .config-import-input { display: none; }
+        .sidebar-divider { border-color: var(--a-border); }
+        .version-meta { font-size: 0.7rem; color: var(--a-muted); }
+        .modal-title { color: var(--a-brand); margin-bottom: 15px; }
+        .reference-content { overflow-x: auto; }
+        button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--a-input-focus); outline-offset: 2px; }
+
+        @media (max-width: 760px) {
+          body { height: 100dvh; }
+          #app-container { flex-direction: column; min-height: 0; }
+          #sidebar { width: 100%; max-height: 42dvh; padding: 12px 14px; border-right: 0; border-bottom: 3px solid var(--a-brand); }
+          #sidebar-footer { margin-top: 8px; padding-top: 10px; }
+          #main-content { min-height: 0; }
+          header { padding: 12px 16px; }
+          .flow-container { padding: 16px 14px 90px; gap: 16px; }
+          .phase-card { padding: 18px; }
+          .floating-reset { right: 14px; bottom: 14px; padding: 11px 16px; }
+        }
+
+        #modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: color-mix(in srgb, var(--a-overlay) 60%, transparent); justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
+        .modal-content { background: var(--a-panel); padding: 25px; border-radius: 8px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; color: var(--a-text); }
         .modal-wide { max-width: 900px; }
-        textarea { width: 100%; height: 100px; margin-top: 10px; font-family: monospace; padding: 10px; border: 1px solid #ccc; }
+        textarea { width: 100%; height: 100px; margin-top: 10px; font-family: monospace; padding: 10px; border: 1px solid var(--a-input-border); background: var(--a-input-bg); color: var(--a-input-text); }
         table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.8rem; }
-        th, td { border: 1px solid var(--border-color); padding: 8px; text-align: left; }
+        th, td { border: 1px solid var(--a-border); padding: 8px; text-align: left; }
     </style>
     <script>
     (function() {
@@ -115,36 +141,35 @@
     <div id="app-container">
         <aside id="sidebar">
             <h2>Panic Buttons</h2>
-            <div id="sidebar-panic-container" style="display: flex; flex-direction: column; gap: 10px;"></div>
-
-            <h2>Live Reference</h2>
-            <input type="text" id="ref-search" onkeyup="filterRefs()" placeholder="Search references...">
-            <div id="sidebar-ref-container" style="display: flex; flex-direction: column; gap: 10px;"></div>
+            <input type="search" id="panic-search" oninput="filterPanicItems()" placeholder="Search buttons and references..." aria-label="Search panic buttons">
+            <div id="sidebar-panic-container" class="sidebar-item-list"></div>
 
             <div id="sidebar-footer">
                 <button class="hotfix-btn" onclick="showHistory()">📜 View Call History</button>
                 <button class="hotfix-btn" onclick="openHotfixModal()">⚙️ Hotfix Config</button>
-                <hr style="border-color: #333;">
-                <div style="font-size: 0.7rem; color: #888;">
-                    OpenCallFlow Version: <strong>0.1.0 (alpha)</strong><br>
+                <button class="hotfix-btn" onclick="exportConfig()">Export Config JSON</button>
+                <label class="hotfix-btn config-import-label">Import Config JSON<input class="config-import-input" type="file" accept="application/json,.json" onchange="importConfigFile(event)"></label>
+                <hr class="sidebar-divider">
+                <div class="version-meta">
+                    OpenCallFlow Version: <strong>1.0.0</strong><br>
                     Flow Version: <strong id="version-display"></strong><br>
                     Updated: <strong id="updated-display"></strong><br><br>
-                    GitHub:     FortePC
+                    GitHub: <a href="https://github.com/fortepc/OpenCallFlow" target="_blank" rel="noopener noreferrer">OpenCallFlow</a>
                 </div>
             </div>
         </aside>
 
         <main id="main-content">
             <header>
-                <div class="logo-text">OpenCallFlow Assistant</div>
+              <div class="header-brand"><div class="logo-text">OpenCallFlow Assistant</div><button id="theme-toggle" class="theme-toggle" type="button" aria-pressed="false" onclick="toggleTheme()">Dark mode</button></div>
             </header>
             <div class="flow-container" id="flow-scroll-wrapper"></div>
         </main>
     </div>
 
-    <div id="modal-overlay" onclick="closeModal()">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <h2 id="modal-title" style="color: var(--brand-color); margin-bottom: 15px;"></h2>
+    <div id="modal-overlay" role="presentation" onclick="closeModal()">
+      <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="modal-title" tabindex="-1" onclick="event.stopPropagation()">
+            <h2 id="modal-title" class="modal-title"></h2>
             <div id="modal-body"></div>
         </div>
     </div>
@@ -152,27 +177,38 @@
     <script>
         let appConfig = {
   "version": "1.0.0",
-  "lastUpdated": "2026-06-27",
+  "lastUpdated": "2026-11-08",
+  "schemaVersion": 2,
+  "theme": {
+    "presetId": "blue",
+    "defaultMode": "light",
+    "palettes": {
+      "light": { "agent": { "brand":"#0056b3", "brandHover":"#004494", "sidebar":"#1a1a1a", "sidebarText":"#ffffff", "page":"#f5f5f7", "panel":"#ffffff", "text":"#333333", "muted":"#6a6a6a", "border":"#e0e0e0", "subtleSurface":"#f0f0f0", "subtleText":"#555555", "inputBg":"#ffffff", "inputText":"#333333", "inputBorder":"#cccccc", "inputFocus":"#0056b3", "buttonSecondary":"#e0e0e0", "buttonSecondaryText":"#333333", "outlineBorder":"#0056b3", "scriptBg":"#f4f8fc", "scriptBorder":"#0056b3", "badgeBg":"#e0e0e0", "badgeText":"#555555", "success":"#2e7d32", "successText":"#ffffff", "danger":"#c62828", "dangerText":"#ffffff", "warningBg":"#fff3cd", "warningText":"#856404", "warningBorder":"#ffebaa", "dangerBg":"#f8d7da", "dangerBorder":"#f5c6cb", "infoBg":"#d1ecf1", "infoText":"#0c5460", "infoBorder":"#bee5eb", "successBg":"#d4edda", "successBorder":"#c3e6cb", "overlay":"#000000", "shadow":"#0056b3" } },
+      "dark": { "agent": { "brand":"#68aaff", "brandHover":"#91c0ff", "sidebar":"#111820", "sidebarText":"#f4f7fb", "page":"#171d25", "panel":"#212a35", "text":"#edf2f7", "muted":"#b1bdca", "border":"#3b4653", "subtleSurface":"#303a46", "subtleText":"#d0d8e1", "inputBg":"#18212b", "inputText":"#edf2f7", "inputBorder":"#526171", "inputFocus":"#91c0ff", "buttonSecondary":"#35404d", "buttonSecondaryText":"#f4f7fb", "outlineBorder":"#91c0ff", "scriptBg":"#263545", "scriptBorder":"#68aaff", "badgeBg":"#35404d", "badgeText":"#e1e8f0", "success":"#68c68a", "successText":"#102318", "danger":"#ff7a79", "dangerText":"#2a1010", "warningBg":"#483b21", "warningText":"#ffe09a", "warningBorder":"#75602f", "dangerBg":"#4a262b", "dangerBorder":"#7d3b43", "infoBg":"#203e4a", "infoText":"#b8eaff", "infoBorder":"#315d6c", "successBg":"#203b2c", "successBorder":"#356344", "overlay":"#000000", "shadow":"#000000" } }
+    }
+  },
   "panicButtons": [
     {
       "id": "supervisor",
+      "type": "response",
       "label": "🛑 Caller requests supervisor",
       "content": "\"I completely understand your frustration. I am happy to get a supervisor for you. May I place you on a brief hold while I brief them on the situation?\""
     },
     {
       "id": "cancel",
+      "type": "response",
       "label": "⚠️ Threatens to cancel",
       "content": "\"I'd hate to see you go! Let's take a look at your account together to see if there is a better plan or solution that fits your needs today.\""
-    }
-  ],
-  "referenceLinks": [
+    },
     {
       "id": "pricing",
+      "type": "reference",
       "label": "📑 Standard Pricing Tier",
       "content": "<div style=\"overflow-x: auto;\"><table><thead><tr><th>Tier</th><th>Price</th><th>Features</th></tr></thead><tbody><tr><td>Basic</td><td>$29.99/mo</td><td>1 User, 5GB Storage</td></tr><tr><td>Pro</td><td>$59.99/mo</td><td>5 Users, 50GB Storage</td></tr><tr><td>Enterprise</td><td>$119.99/mo</td><td>Unlimited Users, 500GB Storage</td></tr></tbody></table></div>"
     },
     {
       "id": "refund_policy",
+      "type": "reference",
       "label": "📄 Refund Policy",
       "content": "Refunds can only be processed within 14 days of the initial transaction. After 14 days, offer account credits only."
     }
@@ -417,63 +453,180 @@
   ]
 };
 
+  ['light', 'dark'].forEach(mode => {
+      const agentPalette = appConfig.theme.palettes[mode].agent;
+      agentPalette.primaryButtonBg = '#0056b3';
+      agentPalette.primaryButtonText = '#ffffff';
+  });
+
         let flowMap = {};
         let currentPath = [];
         let historyPage = 0;
+        let modalReturnFocus = null;
+        const BUTTON_STYLES = ['btn-primary', 'btn-secondary', 'btn-success', 'btn-danger', 'btn-warning', 'btn-outline'];
+        const ALERT_TYPES = ['warning', 'stop', 'info', 'success'];
+        const AGENT_THEME_TOKENS = ['brand', 'brandHover', 'primaryButtonBg', 'primaryButtonText', 'sidebar', 'sidebarText', 'page', 'panel', 'text', 'muted', 'border', 'subtleSurface', 'subtleText', 'inputBg', 'inputText', 'inputBorder', 'inputFocus', 'buttonSecondary', 'buttonSecondaryText', 'outlineBorder', 'scriptBg', 'scriptBorder', 'badgeBg', 'badgeText', 'success', 'successText', 'danger', 'dangerText', 'warningBg', 'warningText', 'warningBorder', 'dangerBg', 'dangerBorder', 'infoBg', 'infoText', 'infoBorder', 'successBg', 'successBorder', 'overlay', 'shadow'];
+        let activeThemeMode = 'light';
+
+        function storageGet(key) {
+          try { return localStorage.getItem(key); } catch (error) { return null; }
+        }
+
+        function storageSet(key, value) {
+          try { localStorage.setItem(key, value); return true; } catch (error) { return false; }
+        }
+
+        function storageRemove(key) {
+          try { localStorage.removeItem(key); } catch (error) { return false; }
+          return true;
+        }
+
+        function validateConfig(config) {
+          if (!config || typeof config !== 'object' || Array.isArray(config)) throw new Error('Configuration must be a JSON object.');
+          if (config.referenceLinks !== undefined) throw new Error('This configuration uses the retired referenceLinks format. Rebuild it with the unified Panic Buttons editor.');
+          if (config.schemaVersion !== 2) throw new Error('Unsupported configuration schema. Expected schemaVersion 2.');
+          if (!Array.isArray(config.panicButtons) || !Array.isArray(config.steps)) throw new Error('Configuration needs panicButtons and steps arrays.');
+          config.panicButtons.forEach((item, index) => {
+            if (!item || !['response', 'reference'].includes(item.type) || ['id', 'label', 'content'].some(field => typeof item[field] !== 'string')) throw new Error('Panic item ' + (index + 1) + ' must have a type, id, label, and content.');
+          });
+          if (!config.theme || !['blue', 'magenta', 'red', 'sky', 'purple', 'green', 'amber', 'monochrome', 'custom'].includes(config.theme.presetId) || !['light', 'dark'].includes(config.theme.defaultMode)) throw new Error('Theme preset or default mode is invalid.');
+          const darkPrimaryColors = { blue:'#0056b3', magenta:'#9d145c', red:'#990d25', sky:'#005b9a', purple:'#54277f', green:'#1d5838', amber:'#704600', monochrome:'#26313c' };
+          const fallbackPresetId = config.theme.presetId === 'custom' ? config.theme.basePresetId || 'blue' : config.theme.presetId;
+          for (const mode of ['light', 'dark']) {
+            const colors = config.theme.palettes?.[mode]?.agent;
+            if (colors && colors.primaryButtonBg === undefined) colors.primaryButtonBg = mode === 'light' ? colors.brand : darkPrimaryColors[fallbackPresetId] || darkPrimaryColors.monochrome;
+            if (colors && colors.primaryButtonText === undefined) colors.primaryButtonText = '#ffffff';
+            if (!colors || AGENT_THEME_TOKENS.some(token => !/^#[0-9a-fA-F]{6}$/.test(colors[token] || ''))) throw new Error('Theme palette "' + mode + '" must include every valid agent color.');
+          }
+          if (!config.steps.length || config.steps[0]?.id !== 'step_1') throw new Error('The first flow step must have ID "step_1".');
+          const ids = new Set();
+          config.steps.forEach((step, index) => {
+            if (!step || typeof step.id !== 'string' || !step.id.trim() || step.id === 'reset' || ids.has(step.id)) throw new Error('Step ' + (index + 1) + ' has an invalid or duplicate ID.');
+            ids.add(step.id);
+            if (['title', 'badge', 'script'].some(field => typeof step[field] !== 'string') || !Array.isArray(step.buttons)) throw new Error('Step "' + step.id + '" is missing required text or buttons.');
+            if (step.alert_type && !ALERT_TYPES.includes(step.alert_type)) throw new Error('Step "' + step.id + '" has an unsupported alert style.');
+            step.buttons.forEach((button, buttonIndex) => {
+              if (!button || typeof button.label !== 'string' || typeof button.target !== 'string' || !BUTTON_STYLES.includes(button.style)) throw new Error('Button ' + (buttonIndex + 1) + ' on "' + step.id + '" has an invalid target or style.');
+            });
+          });
+          config.steps.forEach(step => step.buttons.forEach(button => {
+            if (button.target !== 'reset' && !ids.has(button.target)) throw new Error('Button "' + button.label + '" points to a missing flow step.');
+          }));
+        }
+
+        function applyTheme(mode) {
+          activeThemeMode = mode;
+          const colors = appConfig.theme.palettes[mode].agent;
+          Object.entries(colors).forEach(([name, value]) => {
+            document.documentElement.style.setProperty('--a-' + name.replace(/[A-Z]/g, letter => '-' + letter.toLowerCase()), value);
+          });
+          const toggle = document.getElementById('theme-toggle');
+          toggle.textContent = mode === 'dark' ? 'Light mode' : 'Dark mode';
+          toggle.setAttribute('aria-pressed', mode === 'dark' ? 'true' : 'false');
+          toggle.setAttribute('aria-label', 'Switch to ' + (mode === 'dark' ? 'light' : 'dark') + ' mode');
+        }
+
+        function toggleTheme() {
+          const nextMode = activeThemeMode === 'dark' ? 'light' : 'dark';
+          applyTheme(nextMode);
+          storageSet('themeMode', nextMode);
+        }
+
+        function getCallHistory() {
+          try {
+            const history = JSON.parse(storageGet('callHistory') || '[]');
+            return Array.isArray(history) ? history.filter(item => item && typeof item.timestamp === 'string' && Array.isArray(item.path) && item.path.every(step => step && typeof step.title === 'string' && typeof step.label === 'string')) : [];
+          } catch (error) { return []; }
+        }
 
         function initSidebar() {
             document.getElementById('version-display').innerText = appConfig.version || '1.0.0';
             document.getElementById('updated-display').innerText = appConfig.lastUpdated || 'N/A';
 
             const panicContainer = document.getElementById('sidebar-panic-container');
-            const refContainer = document.getElementById('sidebar-ref-container');
-            panicContainer.innerHTML = ''; refContainer.innerHTML = '';
-
-            if(appConfig.panicButtons) {
-                appConfig.panicButtons.forEach(btn => {
-                    const b = document.createElement('button');
-                    b.className = 'objection-btn';
-                    b.innerText = btn.label;
-                    b.onclick = () => renderModal(btn.label, `<div class="script-box">${btn.content}</div>`);
-                    panicContainer.appendChild(b);
-                });
-            }
-
-            if(appConfig.referenceLinks) {
-                appConfig.referenceLinks.forEach(link => {
-                    const b = document.createElement('button');
-                    b.className = 'objection-btn ref-link-item';
-                    b.innerText = link.label;
-                    b.onclick = () => renderModal(link.label, link.content, true);
-                    refContainer.appendChild(b);
-                });
-            }
-        }
-
-        function filterRefs() {
-            const input = document.getElementById('ref-search').value.toLowerCase();
-            const items = document.querySelectorAll('.ref-link-item');
-            items.forEach(item => {
-                const text = item.innerText.toLowerCase();
-                item.style.display = text.includes(input) ? '' : 'none';
+            panicContainer.replaceChildren();
+            appConfig.panicButtons.forEach(item => {
+              const button = document.createElement('button');
+              button.className = 'objection-btn panic-item';
+              button.textContent = item.label;
+              button.title = item.type === 'reference' ? 'Open reference' : 'Open quick response';
+              button.dataset.search = `${item.label} ${richTextAsPlainText(item.content)}`.toLowerCase();
+              button.addEventListener('click', () => {
+                const content = item.type === 'reference'
+                  ? `<div class="reference-content">${item.content}</div>`
+                  : `<div class="script-box">${item.content}</div>`;
+                renderModal(item.label, content, item.type === 'reference', true);
+              });
+              panicContainer.appendChild(button);
             });
         }
 
-        function renderModal(title, content, isWide = false) {
+          function filterPanicItems() {
+            const input = document.getElementById('panic-search').value.toLowerCase();
+            const items = document.querySelectorAll('.panic-item');
+            items.forEach(item => {
+              item.hidden = !item.dataset.search.includes(input);
+            });
+        }
+
+          const SAFE_RICH_TAGS = new Set(['B', 'STRONG', 'I', 'EM', 'BR', 'DIV', 'SPAN', 'TABLE', 'THEAD', 'TBODY', 'TFOOT', 'TR', 'TH', 'TD']);
+
+          function richTextAsPlainText(value) {
+            const template = document.createElement('template');
+            template.innerHTML = String(value || '');
+            return template.content.textContent || '';
+          }
+
+          function appendSafeRichContent(target, value) {
+            const template = document.createElement('template');
+            template.innerHTML = String(value || '');
+            const clean = node => {
+              [...node.childNodes].forEach(child => {
+                if (child.nodeType !== Node.ELEMENT_NODE) return;
+                if (!SAFE_RICH_TAGS.has(child.tagName)) {
+                  child.replaceWith(document.createTextNode(child.textContent || ''));
+                  return;
+                }
+                [...child.attributes].forEach(attribute => child.removeAttribute(attribute.name));
+                clean(child);
+              });
+            };
+            clean(template.content);
+            target.appendChild(template.content);
+          }
+
+          function renderModal(title, content, isWide = false, allowRich = false) {
             const modalBody = document.getElementById('modal-body');
             const modalTitle = document.getElementById('modal-title');
             const modalContent = document.querySelector('.modal-content');
             const overlay = document.getElementById('modal-overlay');
 
             modalTitle.innerText = title;
-            modalBody.innerHTML = content + `<br><br><button class="btn btn-secondary" onclick="closeModal()">Close</button>`;
+            modalBody.innerHTML = '';
+            if (allowRich) appendSafeRichContent(modalBody, content);
+            else modalBody.innerHTML = content;
+            const close = document.createElement('button');
+            close.className = 'btn btn-secondary';
+            close.textContent = 'Close';
+            close.addEventListener('click', closeModal);
+            modalBody.append(document.createElement('br'), document.createElement('br'), close);
 
             if(isWide) modalContent.classList.add('modal-wide');
             else modalContent.classList.remove('modal-wide');
+            if (overlay.style.display !== 'flex') modalReturnFocus = document.activeElement;
             overlay.style.display = 'flex';
+            modalContent.focus();
         }
 
-        function closeModal() { document.getElementById('modal-overlay').style.display = 'none'; }
+          function closeModal() {
+            document.getElementById('modal-overlay').style.display = 'none';
+            if (modalReturnFocus && modalReturnFocus.isConnected) modalReturnFocus.focus();
+            modalReturnFocus = null;
+          }
+
+        function escapeHtml(value) {
+          return String(value).replace(/[&<>"']/g, character => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[character]);
+        }
 
         function initFlow() {
             flowMap = Object.fromEntries(appConfig.steps.map(s => [s.id, s]));
@@ -484,16 +637,12 @@
         }
 
         function saveToHistory(entry) {
-            let history = JSON.parse(localStorage.getItem('callHistory') || '[]');
+          let history = getCallHistory();
             history.unshift(entry);
-            try {
-                localStorage.setItem('callHistory', JSON.stringify(history));
-            } catch (e) {
-                if (e.name === 'QuotaExceededError') {
-                    history.splice(history.length - 10, 10);
-                    localStorage.setItem('callHistory', JSON.stringify(history));
-                }
-            }
+          if (!storageSet('callHistory', JSON.stringify(history))) {
+            history = history.slice(0, 10);
+            storageSet('callHistory', JSON.stringify(history));
+          }
         }
 
         function resetCall() {
@@ -509,17 +658,39 @@
             card.className = 'phase-card active-focus';
             card.id = `card-${node.id}`;
 
-            let buttonsHtml = '';
-            node.buttons.forEach((b, index) => {
-                const btnId = `btn-${node.id}-${index}`;
-                buttonsHtml += `<button id="${btnId}" class="btn ${b.style}" onclick="handleChoice(this, '${node.id}', '${b.target}', '${b.label}')">${b.label}</button>`;
+            const heading = document.createElement('h1');
+            heading.append(document.createTextNode(node.title + ' '));
+            const badge = document.createElement('span');
+            badge.className = 'step-badge';
+            badge.textContent = node.badge;
+            heading.appendChild(badge);
+            card.appendChild(heading);
+            if (node.alert_text) {
+              const alert = document.createElement('div');
+              alert.className = `alert-banner ${node.alert_type}`;
+              alert.textContent = node.alert_text;
+              card.appendChild(alert);
+            }
+            const script = document.createElement('div');
+            script.className = 'script-box';
+            appendSafeRichContent(script, node.script);
+            card.appendChild(script);
+            if (node.note) {
+              const note = document.createElement('div');
+              note.className = 'notes-box';
+              note.textContent = node.note;
+              card.appendChild(note);
+            }
+            const buttons = document.createElement('div');
+            buttons.className = 'btn-container';
+            node.buttons.forEach(buttonConfig => {
+              const button = document.createElement('button');
+              button.className = `btn ${buttonConfig.style}`;
+              button.textContent = buttonConfig.label;
+              button.addEventListener('click', () => handleChoice(button, node.id, buttonConfig.target, buttonConfig.label));
+              buttons.appendChild(button);
             });
-
-            card.innerHTML = `<h1>${node.title} <span class="step-badge">${node.badge}</span></h1>
-                ${node.alert_text ? `<div class="alert-banner ${node.alert_type}">${node.alert_text}</div>` : ''}
-                <div class="script-box">${node.script}</div>
-                ${node.note ? `<div class="notes-box"><em> ${node.note}</em></div>` : ''}
-                <div class="btn-container">${buttonsHtml}</div>`;
+            card.appendChild(buttons);
             document.getElementById('flow-scroll-wrapper').appendChild(card);
             card.scrollIntoView({ behavior: 'smooth' });
         }
@@ -560,7 +731,7 @@
 
         function showHistory(page = 0) {
             historyPage = page;
-            const history = JSON.parse(localStorage.getItem('callHistory') || '[]');
+            const history = getCallHistory();
             const perPage = 10;
             const start = historyPage * perPage;
             const end = start + perPage;
@@ -570,8 +741,8 @@
             let html = history.length === 0 ? '<p>No history found.</p>' :
                 `<table><thead><tr><th>Time Ended</th><th>Path Taken</th><th>Action</th></tr></thead><tbody>` +
                 slice.map((h, i) => `<tr>
-                    <td>${h.timestamp}</td>
-                    <td>${h.path.map(step => `<strong>${step.title}</strong>: ${step.label} ${step.timestamp ? `(${step.timestamp})` : ''}`).join(' <br>➔ ')}</td>
+                    <td>${escapeHtml(h.timestamp)}</td>
+                    <td>${h.path.map(step => `<strong>${escapeHtml(step.title)}</strong>: ${escapeHtml(step.label)} ${step.timestamp ? `(${escapeHtml(step.timestamp)})` : ''}`).join(' <br>➔ ')}</td>
                     <td><button class="btn btn-danger" style="padding: 5px 10px;" onclick="deleteHistoryItem(${start + i})">Delete</button></td>
                 </tr>`).join('') + `</tbody></table>`;
 
@@ -595,7 +766,7 @@
         }
 
         function exportHistory() {
-            const data = localStorage.getItem('callHistory') || '[]';
+            const data = JSON.stringify(getCallHistory(), null, 2);
             const blob = new Blob([data], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -612,9 +783,9 @@
             reader.onload = function(e) {
                 try {
                     const imported = JSON.parse(e.target.result);
-                    if (!Array.isArray(imported)) throw new Error("File is not a valid history array.");
+                    if (!Array.isArray(imported) || !imported.every(item => item && typeof item.timestamp === 'string' && Array.isArray(item.path) && item.path.every(step => step && typeof step.title === 'string' && typeof step.label === 'string'))) throw new Error('Invalid history records.');
 
-                    let existing = JSON.parse(localStorage.getItem('callHistory') || '[]');
+                    let existing = getCallHistory();
 
                     // Merge logic: Add only if the timestamp and path string aren't identical
                     imported.forEach(item => {
@@ -625,7 +796,7 @@
                         if (!isDuplicate) existing.unshift(item);
                     });
 
-                    localStorage.setItem('callHistory', JSON.stringify(existing));
+                    if (!storageSet('callHistory', JSON.stringify(existing))) throw new Error('Browser storage is unavailable.');
                     alert("History merged successfully!");
                     showHistory(0);
                 } catch(err) {
@@ -637,9 +808,9 @@
 
         function deleteHistoryItem(index) {
             if (confirm("Are you sure you want to delete this specific call record?")) {
-                let history = JSON.parse(localStorage.getItem('callHistory') || '[]');
+                let history = getCallHistory();
                 history.splice(index, 1);
-                localStorage.setItem('callHistory', JSON.stringify(history));
+                storageSet('callHistory', JSON.stringify(history));
                 showHistory(historyPage);
             }
         }
@@ -648,7 +819,7 @@
             if (confirm("TRIPLE CONFIRMATION: Are you ABSOLUTELY sure you want to clear ALL call history? This cannot be undone.")) {
                 if (confirm("Are you really, really sure?")) {
                     if (confirm("Final confirmation: Delete all logs?")) {
-                        localStorage.removeItem('callHistory');
+                        storageRemove('callHistory');
                         showHistory(0);
                     }
                 }
@@ -656,37 +827,93 @@
         }
 
         function openHotfixModal() {
-            renderModal("System Hotfix", `<textarea id="hotfix-input">${JSON.stringify(appConfig, null, 2)}</textarea><div style="margin-top:15px; display:flex; gap:10px;"><button class="btn btn-primary" onclick="applyHotfix()">Apply</button><button class="btn btn-secondary" onclick="closeModal()">Cancel</button></div>`);
+          renderModal('System Hotfix', `<textarea id="hotfix-input">${escapeHtml(JSON.stringify(appConfig, null, 2))}</textarea><div style="margin-top:15px; display:flex; gap:10px;"><button class="btn btn-primary" onclick="applyHotfix()">Apply</button><button class="btn btn-secondary" onclick="closeModal()">Cancel</button></div>`);
+        }
+
+        function installConfig(config) {
+          validateConfig(config);
+          appConfig = config;
+          storageSet('appConfig', JSON.stringify(appConfig));
+          const preference = storageGet('themeMode');
+          applyTheme(['light', 'dark'].includes(preference) ? preference : appConfig.theme.defaultMode);
+          initSidebar();
+          initFlow();
+          closeModal();
         }
 
         function applyHotfix() {
-            try { 
-                const newConfig = JSON.parse(document.getElementById('hotfix-input').value);
-                appConfig = newConfig;
-                
-                // Save to localStorage so it persists on refresh
-                localStorage.setItem('appConfig', JSON.stringify(appConfig));
-                
-                initSidebar(); 
-                initFlow(); 
-                closeModal(); 
-            } catch(e) { 
-                alert("Invalid JSON!"); 
-            }
+          try {
+            installConfig(JSON.parse(document.getElementById('hotfix-input').value));
+          } catch (error) {
+            alert('Invalid configuration: ' + error.message);
+          }
         }
 
+        function exportConfig() {
+          const blob = new Blob([JSON.stringify(appConfig, null, 2)], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `OpenCallFlow_Config_${new Date().toISOString().split('T')[0]}.json`;
+          link.click();
+          URL.revokeObjectURL(url);
+        }
+
+        function importConfigFile(event) {
+          const file = event.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = () => {
+            try { installConfig(JSON.parse(reader.result)); }
+            catch (error) { alert('Invalid configuration: ' + error.message); }
+            event.target.value = '';
+          };
+          reader.readAsText(file);
+        }
+
+        document.addEventListener('keydown', event => {
+          const overlay = document.getElementById('modal-overlay');
+          if (overlay.style.display !== 'flex') return;
+          if (event.key === 'Escape') {
+            closeModal();
+            return;
+          }
+          if (event.key !== 'Tab') return;
+          const modal = overlay.querySelector('.modal-content');
+          const focusable = [...modal.querySelectorAll('button:not([disabled]), a[href], input:not([disabled]), textarea:not([disabled]), select:not([disabled])')]
+            .filter(element => element.getClientRects().length > 0);
+          if (!focusable.length) {
+            event.preventDefault();
+            modal.focus();
+            return;
+          }
+          const first = focusable[0];
+          const last = focusable[focusable.length - 1];
+          if (event.shiftKey && (document.activeElement === first || document.activeElement === modal)) {
+            event.preventDefault();
+            last.focus();
+          } else if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first.focus();
+          }
+        });
+
         window.onload = () => {
-            // Attempt to load from localStorage first
-            const savedConfig = localStorage.getItem('appConfig');
+          const savedConfig = storageGet('appConfig');
             if (savedConfig) {
                 try {
-                    appConfig = JSON.parse(savedConfig);
-                } catch (e) {
-                    console.error("Failed to parse saved config, using default.");
+              const parsed = JSON.parse(savedConfig);
+              validateConfig(parsed);
+              appConfig = parsed;
+            } catch (error) {
+              console.error('Saved configuration is invalid; using the embedded default.', error);
                 }
             }
-            initSidebar(); 
-            initFlow(); 
+          const preference = storageGet('themeMode');
+          validateConfig(appConfig);
+          applyTheme(['light', 'dark'].includes(preference) ? preference : appConfig.theme.defaultMode);
+          initSidebar();
+          initFlow();
         };
     </script>
 </body>
