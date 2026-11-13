@@ -29,6 +29,8 @@ OpenCallFlow replaces rigid scripts with an interactive conversational blueprint
 
 The current configuration format is schema version `2`. Panic responses and reference material share the searchable `panicButtons` collection; each item uses `type: "response"` or `type: "reference"`. The former separate `referenceLinks` format is no longer accepted.
 
+Step scripts, alerts, notes, and panic-button content support Markdown. Use `**bold**` or `__bold__`, `*italic*` or `_italic_`, `++underline++`, `~~strikethrough~~`, and `[link text](https://example.com)` for inline formatting. The renderer also supports headings, paragraphs, blockquotes, inline and fenced code, horizontal rules, ordered and unordered lists, and pipe tables. Raw HTML is not supported; use Markdown instead. For safety, links are limited to HTTP(S), email, telephone, and relative URLs.
+
 ```json
 {
 	"schemaVersion": 2,

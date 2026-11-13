@@ -53,7 +53,18 @@
         h1 { font-size: 1.4rem; margin-bottom: 15px; color: var(--a-text); display: flex; justify-content: space-between; align-items: center; }
         .step-badge { font-size: 0.8rem; background: var(--a-badge-bg); padding: 4px 10px; border-radius: 12px; color: var(--a-badge-text); }
         .script-box { background-color: var(--a-script-bg); border-left: 4px solid var(--a-script-border); padding: 15px 20px; border-radius: 0 8px 8px 0; margin-bottom: 20px; font-size: 1.05rem; line-height: 1.6; }
-        .notes-box { font-size: 0.85rem; color: var(--a-muted); font-style: italic; margin-top: 15px; padding: 10px; background: var(--a-subtle-surface); border-radius: 4px; }
+        .notes-box { font-size: 0.85rem; color: var(--a-muted); margin-top: 15px; padding: 10px; background: var(--a-subtle-surface); border-radius: 4px; }
+        .markdown-content > :first-child { margin-top: 0; }
+        .markdown-content > :last-child { margin-bottom: 0; }
+        .markdown-content ul, .markdown-content ol { padding-left: 1.6em; }
+        .markdown-content table { border-collapse: collapse; margin: 0.8em 0; }
+        .markdown-content th, .markdown-content td { border: 1px solid var(--a-border); padding: 6px 9px; text-align: left; }
+        .markdown-content th { background: var(--a-subtle-surface); }
+        .markdown-content pre { overflow-x: auto; padding: 10px; background: var(--a-subtle-surface); border-radius: 4px; }
+        .markdown-content code { padding: 0.1em 0.3em; background: var(--a-subtle-surface); border-radius: 3px; }
+        .markdown-content pre code { padding: 0; background: transparent; }
+        .markdown-content blockquote { margin-left: 0; padding-left: 1em; border-left: 3px solid var(--a-border); color: var(--a-muted); }
+        .markdown-content a { color: var(--a-brand); }
 
         .alert-banner { padding: 12px 15px; border-radius: 6px; margin-bottom: 20px; font-size: 0.95rem; border: 1px solid transparent; }
         .alert-banner.warning { background-color: var(--a-warning-bg); border-color: var(--a-warning-border); color: var(--a-warning-text); }
@@ -204,7 +215,7 @@
       "id": "pricing",
       "type": "reference",
       "label": "📑 Standard Pricing Tier",
-      "content": "<div style=\"overflow-x: auto;\"><table><thead><tr><th>Tier</th><th>Price</th><th>Features</th></tr></thead><tbody><tr><td>Basic</td><td>$29.99/mo</td><td>1 User, 5GB Storage</td></tr><tr><td>Pro</td><td>$59.99/mo</td><td>5 Users, 50GB Storage</td></tr><tr><td>Enterprise</td><td>$119.99/mo</td><td>Unlimited Users, 500GB Storage</td></tr></tbody></table></div>"
+      "content": "| Tier | Price | Features |\n| --- | --- | --- |\n| Basic | $29.99/mo | 1 User, 5GB Storage |\n| Pro | $59.99/mo | 5 Users, 50GB Storage |\n| Enterprise | $119.99/mo | Unlimited Users, 500GB Storage |"
     },
     {
       "id": "refund_policy",
@@ -218,7 +229,7 @@
       "id": "step_1",
       "title": "Greeting & Verification",
       "badge": "START",
-      "script": "\"Thank you for calling our sales line! My name is <strong>[Agent Name]</strong>. Who do I have the pleasure of speaking with today?\"<br><br>\"Thank you <strong>[Customer Name]</strong>, what has you calling in today?\"",
+      "script": "\"Thank you for calling our sales line! My name is **[Agent Name]**. Who do I have the pleasure of speaking with today?\"\n\n\"Thank you **[Customer Name]**, what has you calling in today?\"",
       "note": "Listen actively, pull out pain points (price hikes, slow speeds, dropped connections, workflow issues).",
       "buttons": [
         {
@@ -243,7 +254,7 @@
       "title": "Locate Their Account",
       "badge": "LOOKUP",
       "alert_type": "warning",
-      "script": "\"I can certainly help you with that! To make sure I am looking at the correct file, may I please have your account number, or the phone number associated with your account?\"<br><br><em>[While searching/loading]</em> \"Thank you. While my system is pulling that up, how has your week been going so far?\"",
+      "script": "\"I can certainly help you with that! To make sure I am looking at the correct file, may I please have your account number, or the phone number associated with your account?\"\n\n*[While searching/loading]* \"Thank you. While my system is pulling that up, how has your week been going so far?\"",
       "buttons": [
         {
           "label": "Authenticated",
@@ -355,7 +366,7 @@
       "id": "pitchSolution",
       "title": "Pitch the Perfect Solution",
       "badge": "THE PITCH",
-      "script": "\"Based on what you shared about needing a reliable connection for <strong>[Pain Point / Use Case]</strong>, I highly recommend our <strong>[Tier Name]</strong> package. This completely eliminates <strong>[Pain Point]</strong> by offering you <strong>[Top Feature/Benefit]</strong>. Right now, we have a fantastic promotion running where you get all of this for just <strong>[Price]</strong> a month! How does that sound to you?\"",
+      "script": "\"Based on what you shared about needing a reliable connection for **[Pain Point / Use Case]**, I highly recommend our **[Tier Name]** package. This completely eliminates **[Pain Point]** by offering you **[Top Feature/Benefit]**. Right now, we have a fantastic promotion running where you get all of this for just **[Price]** a month! How does that sound to you?\"",
       "buttons": [
         {
           "label": "Customer Accepts",
@@ -373,7 +384,7 @@
       "id": "handleObjections",
       "title": "Overcome Objections",
       "badge": "REBOUND",
-      "script": "\"I completely hear where you are coming from regarding <strong>[Price / Value / Commitment]</strong>. It makes total sense to want to ensure you are getting real value. Many clients who felt the same way initially found that this plan actually saves them money in the long run by preventing <strong>[Pain Point]</strong>. Remember, we also back this up with our 14-day policy. Let's try this out risk-free to make sure it delivers for you; shall we proceed?\"",
+      "script": "\"I completely hear where you are coming from regarding **[Price / Value / Commitment]**. It makes total sense to want to ensure you are getting real value. Many clients who felt the same way initially found that this plan actually saves them money in the long run by preventing **[Pain Point]**. Remember, we also back this up with our 14-day policy. Let's try this out risk-free to make sure it delivers for you; shall we proceed?\"",
       "buttons": [
         {
           "label": "Objection Overcome",
@@ -391,7 +402,7 @@
       "id": "paymentProcessing",
       "title": "Payment & Processing",
       "badge": "CHECKOUT",
-      "script": "\"Fantastic choice! You are going to love this setup. To finalize your secure order and lock in today's promotional rate, I just need to process the initial month payment of <strong>[Amount]</strong>. For your billing preferences, will you be using Visa, Mastercard, or an Electronic Check today?\"",
+      "script": "\"Fantastic choice! You are going to love this setup. To finalize your secure order and lock in today's promotional rate, I just need to process the initial month payment of **[Amount]**. For your billing preferences, will you be using Visa, Mastercard, or an Electronic Check today?\"",
       "note": "Follow all secure payment and PCI compliance protocols. Never write down or read back CVV codes aloud.",
       "buttons": [
         {
@@ -430,7 +441,7 @@
       "id": "orderConfirmation",
       "title": "Order Confirmation",
       "badge": "CONFIRM",
-      "script": "\"Excellent! The payment processed perfectly. Your official order confirmation number is <strong>[Confirmation #]</strong>, and I have sent a complete receipt along with onboarding instructions directly to your email. Your new services will be fully active and ready to go starting <strong>[Date/Time]</strong>!\"",
+      "script": "\"Excellent! The payment processed perfectly. Your official order confirmation number is **[Confirmation #]**, and I have sent a complete receipt along with onboarding instructions directly to your email. Your new services will be fully active and ready to go starting **[Date/Time]**!\"",
       "buttons": [
         {
           "label": "Wrap Up Call",
@@ -550,12 +561,9 @@
               button.className = 'objection-btn panic-item';
               button.textContent = item.label;
               button.title = item.type === 'reference' ? 'Open reference' : 'Open quick response';
-              button.dataset.search = `${item.label} ${richTextAsPlainText(item.content)}`.toLowerCase();
+              button.dataset.search = `${item.label} ${markdownAsPlainText(item.content)}`.toLowerCase();
               button.addEventListener('click', () => {
-                const content = item.type === 'reference'
-                  ? `<div class="reference-content">${item.content}</div>`
-                  : `<div class="script-box">${item.content}</div>`;
-                renderModal(item.label, content, item.type === 'reference', true);
+                renderModal(item.label, item.content, item.type === 'reference', item.type === 'reference' ? 'reference-content' : 'script-box');
               });
               panicContainer.appendChild(button);
             });
@@ -569,33 +577,153 @@
             });
         }
 
-          const SAFE_RICH_TAGS = new Set(['B', 'STRONG', 'I', 'EM', 'BR', 'DIV', 'SPAN', 'TABLE', 'THEAD', 'TBODY', 'TFOOT', 'TR', 'TH', 'TD']);
-
-          function richTextAsPlainText(value) {
-            const template = document.createElement('template');
-            template.innerHTML = String(value || '');
-            return template.content.textContent || '';
+          function escapeHtml(value) {
+            return String(value).replace(/[&<>"']/g, character => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[character]);
           }
 
-          function appendSafeRichContent(target, value) {
-            const template = document.createElement('template');
-            template.innerHTML = String(value || '');
-            const clean = node => {
-              [...node.childNodes].forEach(child => {
-                if (child.nodeType !== Node.ELEMENT_NODE) return;
-                if (!SAFE_RICH_TAGS.has(child.tagName)) {
-                  child.replaceWith(document.createTextNode(child.textContent || ''));
-                  return;
-                }
-                [...child.attributes].forEach(attribute => child.removeAttribute(attribute.name));
-                clean(child);
-              });
+          function safeMarkdownUrl(value) {
+            try {
+              const url = new URL(value, document.baseURI);
+              return ['http:', 'https:', 'mailto:', 'tel:'].includes(url.protocol) || (!/^[a-z][a-z\d+.-]*:/i.test(value) && url.protocol === window.location.protocol);
+            } catch (error) {
+              return false;
+            }
+          }
+
+          function renderMarkdownInline(value) {
+            const preserved = [];
+            const preserve = html => `\uE000${preserved.push(html) - 1}\uE001`;
+            let source = String(value);
+            source = source.replace(/`([^`\n]+)`/g, (match, code) => preserve(`<code>${escapeHtml(code)}</code>`));
+            source = source.replace(/\[([^\]]+)\]\(([^)\s]+)(?:\s+"([^"]*)")?\)/g, (match, label, href, title) => {
+              if (!safeMarkdownUrl(href)) return match;
+              const titleAttribute = title ? ` title="${escapeHtml(title)}"` : '';
+              return preserve(`<a href="${escapeHtml(href)}"${titleAttribute}>${escapeHtml(label)}</a>`);
+            });
+            source = escapeHtml(source)
+              .replace(/\*\*\*(?=\S)(.+?\S)\*\*\*/g, '<strong><em>$1</em></strong>')
+              .replace(/___(?=\S)(.+?\S)___/g, '<strong><em>$1</em></strong>')
+              .replace(/(\*\*|__)(?=\S)(.+?\S)\1/g, '<strong>$2</strong>')
+              .replace(/~~(?=\S)(.+?\S)~~/g, '<del>$1</del>')
+              .replace(/\+\+(?=\S)(.+?\S)\+\+/g, '<u>$1</u>')
+              .replace(/(^|[^\*])\*([^*\n]+)\*(?!\*)/g, '$1<em>$2</em>')
+              .replace(/(^|[^\w])_([^_\s][^_\n]*?)_(?![\w])/g, '$1<em>$2</em>')
+              .replace(/\n/g, '<br>');
+            return source.replace(/\uE000(\d+)\uE001/g, (match, index) => preserved[Number(index)]);
+          }
+
+          function renderMarkdown(value) {
+            const lines = String(value || '').replace(/\r\n?/g, '\n').split('\n');
+            const output = [];
+            const isList = line => /^\s*([-+*]|\d+[.)])\s+/.test(line);
+            const cells = line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split('|').map(cell => cell.trim());
+            const isTable = index => {
+              if (index + 1 >= lines.length || !lines[index].includes('|')) return false;
+              const headers = cells(lines[index]);
+              const separators = cells(lines[index + 1]);
+              return headers.length === separators.length && separators.every(cell => /^:?-{3,}:?$/.test(cell));
             };
-            clean(template.content);
-            target.appendChild(template.content);
+            const isBlockStart = index => {
+              const line = lines[index];
+              return /^ {0,3}(#{1,6})\s+/.test(line) || /^ {0,3}(```+|~~~+)/.test(line) ||
+                /^ {0,3}(?:-{3,}|\*{3,}|_{3,})\s*$/.test(line) || /^ {0,3}>/.test(line) ||
+                isList(line) || isTable(index);
+            };
+            const renderList = start => {
+              const first = lines[start].match(/^(\s*)([-+*]|\d+[.)])\s+(.*)$/);
+              const indent = first[1].length;
+              const ordered = /^\d/.test(first[2]);
+              const tag = ordered ? 'ol' : 'ul';
+              const items = [];
+              let index = start;
+              while (index < lines.length) {
+                const item = lines[index].match(/^(\s*)([-+*]|\d+[.)])\s+(.*)$/);
+                if (item && item[1].length === indent && /^\d/.test(item[2]) === ordered) {
+                  items.push({ text: item[3], nested: [] });
+                  index++;
+                } else if (item && item[1].length > indent && items.length) {
+                  const nested = renderList(index);
+                  items[items.length - 1].nested.push(nested.html);
+                  index = nested.end;
+                } else if (items.length && lines[index].trim() && /^\s+/.test(lines[index])) {
+                  items[items.length - 1].text += `\n${lines[index].trim()}`;
+                  index++;
+                } else break;
+              }
+              return {
+                html: `<${tag}>${items.map(item => `<li>${renderMarkdownInline(item.text)}${item.nested.join('')}</li>`).join('')}</${tag}>`,
+                end: index
+              };
+            };
+
+            for (let index = 0; index < lines.length;) {
+              const line = lines[index];
+              if (!line.trim()) { index++; continue; }
+
+              const fence = line.match(/^ {0,3}(```+|~~~+)/);
+              if (fence) {
+                const code = [];
+                index++;
+                while (index < lines.length && !new RegExp(`^ {0,3}${fence[1][0]}{${fence[1].length},}\\s*$`).test(lines[index])) code.push(lines[index++]);
+                if (index < lines.length) index++;
+                output.push(`<pre><code>${escapeHtml(code.join('\n'))}</code></pre>`);
+                continue;
+              }
+
+              const heading = line.match(/^ {0,3}(#{1,6})\s+(.*?)(?:\s+#+\s*)?$/);
+              if (heading) {
+                const level = heading[1].length;
+                output.push(`<h${level}>${renderMarkdownInline(heading[2])}</h${level}>`);
+                index++;
+                continue;
+              }
+              if (/^ {0,3}(?:-{3,}|\*{3,}|_{3,})\s*$/.test(line)) {
+                output.push('<hr>');
+                index++;
+                continue;
+              }
+              if (isTable(index)) {
+                const headers = cells(line);
+                const alignments = cells(lines[index + 1]).map(cell => cell.startsWith(':') && cell.endsWith(':') ? 'center' : cell.endsWith(':') ? 'right' : cell.startsWith(':') ? 'left' : '');
+                index += 2;
+                const rows = [];
+                while (index < lines.length && lines[index].includes('|') && lines[index].trim()) rows.push(cells(lines[index++]));
+                output.push(`<table><thead><tr>${headers.map((cell, cellIndex) => `<th${alignments[cellIndex] ? ` style="text-align:${alignments[cellIndex]}"` : ''}>${renderMarkdownInline(cell)}</th>`).join('')}</tr></thead><tbody>${rows.map(row => `<tr>${headers.map((header, cellIndex) => `<td${alignments[cellIndex] ? ` style="text-align:${alignments[cellIndex]}"` : ''}>${renderMarkdownInline(row[cellIndex] || '')}</td>`).join('')}</tr>`).join('')}</tbody></table>`);
+                continue;
+              }
+              if (/^ {0,3}>/.test(line)) {
+                const quote = [];
+                while (index < lines.length && /^ {0,3}>/.test(lines[index])) quote.push(lines[index++].replace(/^ {0,3}> ?/, ''));
+                output.push(`<blockquote>${renderMarkdown(quote.join('\n'))}</blockquote>`);
+                continue;
+              }
+              if (isList(line)) {
+                const list = renderList(index);
+                output.push(list.html);
+                index = list.end;
+                continue;
+              }
+
+              const paragraph = [line];
+              index++;
+              while (index < lines.length && lines[index].trim() && !isBlockStart(index)) paragraph.push(lines[index++]);
+              output.push(`<p>${renderMarkdownInline(paragraph.join('\n'))}</p>`);
+            }
+            return output.join('');
           }
 
-          function renderModal(title, content, isWide = false, allowRich = false) {
+          function appendMarkdownContent(target, value) {
+            target.classList.add('markdown-content');
+            target.innerHTML = renderMarkdown(value);
+          }
+
+          function markdownAsPlainText(value) {
+            const container = document.createElement('div');
+            appendMarkdownContent(container, value);
+            return container.textContent || '';
+          }
+
+          function renderModal(title, content, isWide = false, markdownClass = '') {
             const modalBody = document.getElementById('modal-body');
             const modalTitle = document.getElementById('modal-title');
             const modalContent = document.querySelector('.modal-content');
@@ -603,7 +731,12 @@
 
             modalTitle.innerText = title;
             modalBody.innerHTML = '';
-            if (allowRich) appendSafeRichContent(modalBody, content);
+            if (markdownClass) {
+              const markdown = document.createElement('div');
+              markdown.className = markdownClass;
+              appendMarkdownContent(markdown, content);
+              modalBody.appendChild(markdown);
+            }
             else modalBody.innerHTML = content;
             const close = document.createElement('button');
             close.className = 'btn btn-secondary';
@@ -623,10 +756,6 @@
             if (modalReturnFocus && modalReturnFocus.isConnected) modalReturnFocus.focus();
             modalReturnFocus = null;
           }
-
-        function escapeHtml(value) {
-          return String(value).replace(/[&<>"']/g, character => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[character]);
-        }
 
         function initFlow() {
             flowMap = Object.fromEntries(appConfig.steps.map(s => [s.id, s]));
@@ -668,17 +797,17 @@
             if (node.alert_text) {
               const alert = document.createElement('div');
               alert.className = `alert-banner ${node.alert_type}`;
-              alert.textContent = node.alert_text;
+              appendMarkdownContent(alert, node.alert_text);
               card.appendChild(alert);
             }
             const script = document.createElement('div');
             script.className = 'script-box';
-            appendSafeRichContent(script, node.script);
+            appendMarkdownContent(script, node.script);
             card.appendChild(script);
             if (node.note) {
               const note = document.createElement('div');
               note.className = 'notes-box';
-              note.textContent = node.note;
+              appendMarkdownContent(note, node.note);
               card.appendChild(note);
             }
             const buttons = document.createElement('div');

@@ -214,7 +214,7 @@
 
     <div id="section-panic" class="tab-content" style="display:none;">
         <div class="section-header">
-            <h2>Panic Buttons</h2>
+            <div><h2>Panic Buttons</h2><p class="section-subtitle">Response and reference content supports Markdown.</p></div>
             <button class="action btn-add" onclick="addItem('panicButtons')">+ Add Item</button>
         </div>
         <div id="list-panic"></div>
@@ -850,9 +850,10 @@
             <label>Step ID</label><input data-step-field="id" value="${safe(step.id)}" ${step.id === 'step_1' ? 'readonly' : ''}>
             <label>Title</label><input data-step-field="title" value="${safe(step.title)}">
             <label>Badge</label><input data-step-field="badge" value="${safe(step.badge)}">
-            <div class="alert-box"><div class="grid-2"><div><label style="margin-top:0">Alert type</label><select data-step-field="alert_type"><option value="" ${!step.alert_type ? 'selected' : ''}>None</option><option value="warning" ${step.alert_type === 'warning' ? 'selected' : ''}>Warning</option><option value="stop" ${step.alert_type === 'stop' ? 'selected' : ''}>Stop</option><option value="info" ${step.alert_type === 'info' ? 'selected' : ''}>Info</option><option value="success" ${step.alert_type === 'success' ? 'selected' : ''}>Success</option></select></div><div><label style="margin-top:0">Alert text</label><input data-step-field="alert_text" value="${safe(step.alert_text)}"></div></div></div>
+            <div class="alert-box"><div class="grid-2"><div><label style="margin-top:0">Alert type</label><select data-step-field="alert_type"><option value="" ${!step.alert_type ? 'selected' : ''}>None</option><option value="warning" ${step.alert_type === 'warning' ? 'selected' : ''}>Warning</option><option value="stop" ${step.alert_type === 'stop' ? 'selected' : ''}>Stop</option><option value="info" ${step.alert_type === 'info' ? 'selected' : ''}>Info</option><option value="success" ${step.alert_type === 'success' ? 'selected' : ''}>Success</option></select></div><div><label style="margin-top:0">Alert text</label><textarea rows="3" data-step-field="alert_text">${safe(step.alert_text)}</textarea></div></div></div>
             <label>Agent script</label><textarea data-step-field="script">${safe(step.script)}</textarea>
-            <label>Note</label><input data-step-field="note" value="${safe(step.note)}">
+            <div class="field-note">Markdown is supported in scripts, alerts, notes, and panic content. Use ++text++ for underline.</div>
+            <label>Note</label><textarea rows="3" data-step-field="note">${safe(step.note)}</textarea>
             <div class="button-editor"><div class="button-editor-head"><h4>Response buttons</h4><span class="field-note">Order is preserved</span></div>
                 ${step.buttons.map((button, index) => `<div class="button-item"><div class="button-item-top"><span>BUTTON ${index + 1}</span><span class="button-actions"><button class="mini-btn" data-button-action="up" data-index="${index}" title="Move up" ${index === 0 ? 'disabled' : ''}>↑</button><button class="mini-btn" data-button-action="down" data-index="${index}" title="Move down" ${index === step.buttons.length - 1 ? 'disabled' : ''}>↓</button><button class="mini-btn danger" data-button-action="delete" data-index="${index}" title="Delete button">×</button></span></div>
                     <label>Button label</label><input data-button-field="label" data-index="${index}" value="${safe(button.label)}">
